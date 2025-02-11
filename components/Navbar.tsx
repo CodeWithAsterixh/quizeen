@@ -27,6 +27,9 @@ const Navbar: React.FC = () => {
           <Link href="/about" className="text-gray-600 hover:text-gray-800">
             About
           </Link>
+          <Link href="/results" className="text-gray-600 hover:text-gray-800">
+            Results
+          </Link>
           {user?<Link href="/account" className="text-gray-600 hover:text-gray-800">
             Account
           </Link>:<Link href="/auth/login" className="bg-gradient-to-br from-neutral-800 to-neutral-500 duration-300 hover:bg-gradient-to-l hover:scale-105 text-white px-3 py-1 rounded-md">
@@ -73,6 +76,9 @@ const Navbar: React.FC = () => {
           </Link>
           <Link href="/about" className="block py-2 text-gray-600 hover:text-gray-800">
             About
+          </Link>
+          <Link href="/results" className="block py-2 text-gray-600 hover:text-gray-800">
+            Result
           </Link>
           {
             user?<Link href="/account" className="block py-2 text-gray-600 hover:text-gray-800">

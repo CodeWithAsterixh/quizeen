@@ -16,7 +16,6 @@ export async function POST(req: Request) {
       await User.deleteOne({email})
   
       return NextResponse.json({ message: "user deleted sucessfully"} ,{status:200});
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error: any) {
       return NextResponse.json({ message: "Profile update failed", error: error.message }, { status: 500 });
     }

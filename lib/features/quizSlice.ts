@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { QuizState, QuizResult, Quiz, QuizAttempt } from "@/types";
+import { QuestionResultSubmission, Quiz, QuizAttempt, QuizResult, QuizState } from "@/types";
 import api from "@/utils/api";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Initial state for quizzes
 const initialState: QuizState = {
@@ -10,6 +10,7 @@ const initialState: QuizState = {
   loading: false,
   error: null,
   results: null,
+  userCompleted:[]
 };
 
 // Async thunk to fetch all quizzes
@@ -39,11 +40,23 @@ export const fetchQuizById = createAsyncThunk<Quiz, string>(
 );
 
 // Async thunk to submit quiz answers
-export const submitQuiz = createAsyncThunk<QuizResult, QuizAttempt>(
+export const submitQuiz = createAsyncThunk<QuizResult, QuestionResultSubmission>(
   "quiz/submitQuiz",
   async (submissionData, { rejectWithValue }) => {
     try {
-      const response = await api.post<QuizResult>("/quizzes/submit", submissionData);
+      const response = await api.post<QuizResult>(`/quizzes/${submissionData.quizId}/submit`, submissionData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to submit quiz");
+    }
+  }
+);
+// Async thunk to submit quiz answers
+export const getResults = createAsyncThunk<QuizAttempt[], string>(
+  "quiz/getresults",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await api.get<QuizAttempt[]>(`/results/${userId}`);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to submit quiz");
@@ -51,6 +64,18 @@ export const submitQuiz = createAsyncThunk<QuizResult, QuizAttempt>(
   }
 );
 
+// Async thunk to submit quiz answers
+export const CreateQuiz = createAsyncThunk<QuizResult, Quiz>(
+  "quiz/createQuiz",
+  async (submissionData, { rejectWithValue }) => {
+    try {
+      const response = await api.post<QuizResult>("/admin/create", submissionData);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to submit quiz");
+    }
+  }
+);
 // Slice for quizzes
 const quizSlice = createSlice({
   name: "quiz",
@@ -99,6 +124,32 @@ const quizSlice = createSlice({
         state.loading = false;
       })
       .addCase(submitQuiz.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle Creating a quiz
+      .addCase(CreateQuiz.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(CreateQuiz.fulfilled, (state, action: PayloadAction<QuizResult>) => {
+        state.results = action.payload;
+        state.loading = false;
+      })
+      .addCase(CreateQuiz.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Handle Creating a quiz
+      .addCase(getResults.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getResults.fulfilled, (state, action: PayloadAction<QuizAttempt[]>) => {
+        state.userCompleted = action.payload;
+        state.loading = false;
+      })
+      .addCase(getResults.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       });

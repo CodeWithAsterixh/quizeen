@@ -55,6 +55,7 @@ const QuizResultSchema: Schema<IQuizResult> = new Schema(
     },
   },
   {
+    collection:"quizresults",
     timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );

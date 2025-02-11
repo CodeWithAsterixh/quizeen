@@ -15,3 +15,13 @@ body {
 *{
   @apply box-border
 }
+
+.scrollbar::-webkit-scrollbar{
+  @apply bg-transparent w-2 h-2
+}
+.scrollbar::-webkit-scrollbar-thumb{
+  @apply bg-neutral-400 rounded-full
+}
+.scrollbar::-webkit-scrollbar-corner{
+  @apply bg-transparent
+}

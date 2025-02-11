@@ -5,6 +5,7 @@ import QuizCard from '@/components/QuizCard';
 import { Button } from '@/components/ui/button';
 import { fetchQuizzes } from '@/lib/features/quizSlice'; // Action for fetching quizzes
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import Link from 'next/link';
 import { useEffect } from 'react';
 
 const HomePage = () => {
@@ -45,7 +46,8 @@ const HomePage = () => {
         </div>
         {
           user&&user.role==="admin"&&<div className="mt-8 text-center">
-          <Button className="mx-auto">Create New Quiz</Button>
+          <Link href={"/new"}>
+          <Button className="mx-auto">Create New Quiz</Button></Link>
         </div>
         }
       </div>

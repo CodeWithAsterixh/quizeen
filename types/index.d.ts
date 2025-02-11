@@ -6,13 +6,12 @@ export interface User {
   passwordHash?: string;
   createdAt: string;
   updatedAt: string;
-  role:"user"|"admin"
+  role: "user" | "admin";
   preferences: SettingsState;
-
 }
 
 export interface AuthResponse {
-  user: Omit<User, 'passwordHash'>;
+  user: Omit<User, "passwordHash">;
   token: string;
 }
 // auth-payloads.interface.ts
@@ -28,8 +27,7 @@ export interface RegisterPayload {
   confirmPassword: string;
 }
 
-
-export type selectedOptions = 'A' | 'B' | 'C' | 'D';
+export type selectedOptions = "A" | "B" | "C" | "D";
 // quiz.interface.ts
 export interface Quiz {
   _id: string;
@@ -62,10 +60,10 @@ export interface QuizAttempt {
   score: number;
   totalQuestions: number;
   correctAnswers: number;
-  answers: { questionId: string; selectedOption: selectedOptions }[];
+  details: details[];
   createdAt: string;
+  completionTime: string;
 }
-
 
 // redux-state.interface.ts
 export interface AuthState {
@@ -81,10 +79,11 @@ export interface QuizState {
   loading: boolean;
   error: string | null;
   results: QuizResult | null;
+  userCompleted: QuizAttempt[];
 }
 
 export interface SettingsState {
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   saveResults: boolean;
 }
 
@@ -96,6 +95,12 @@ export interface QuizResult {
   details: QuestionResult[];
 }
 
+export interface QuestionResultSubmission {
+  quizId: string;
+  userId: string;
+  answers: Record<number, selectedOptions>;
+}
+
 export interface QuestionResult {
   questionId: string;
   userAnswer: string;
@@ -103,5 +108,11 @@ export interface QuestionResult {
   isCorrect: boolean;
 }
 
-
-
+export interface details {
+  questionId: string;
+  userAnswer: selectedOptions;
+  correctAnswer: selectedOptions;
+  isCorrect: boolean;
+  timeTaken: string;
+  _id: string;
+}

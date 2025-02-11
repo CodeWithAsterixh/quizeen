@@ -26,6 +26,8 @@ const quizSchema = new Schema({
   createdBy: { type: String, required: true }, // User ID
   createdAt: { type: String, required: true },
   updatedAt: { type: String, required: true },
+},{
+  collection: "quizzes"
 });
 
 export const Quiz = mongoose.models.Quiz || mongoose.model('Quiz', quizSchema);
