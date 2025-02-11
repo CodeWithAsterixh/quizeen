@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       totalQuestions: quiz.questions.length,
       details,
       completionTime: "15:00", // Example time; can be captured in the frontend
-    }, {new: true});
+    });
 
     await result.save();
     return NextResponse.json(result);

@@ -18,8 +18,8 @@ export default function QuizResultsTable({ results }: QuizResultsTableProps) {
             return res.data
         }
         useEffect(() => {
-            console.log(results)
           results.map((result)=>{
+            console.log(result)
             getQuizzes(result.quizId).then((quizRes:Quiz)=>{
                 setQuiz(q => [...q,quizRes])
             })

@@ -4,12 +4,16 @@ import { submitQuiz } from "@/lib/features/quizSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { selectedOptions } from "@/types";
 import clsx from "clsx";
+import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const QuestionComponent = () => {
   const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
+  const {loading} = useAppSelector((s) => s.quiz);
   const user = useAppSelector((s) => s.auth.user);
   const [quizState, setQuizState] = useState({
     current: 0,
@@ -17,7 +21,7 @@ const QuestionComponent = () => {
   });
   const dispatch = useAppDispatch();
   const [answers, setAnswers] = useState<Record<number, selectedOptions>>({});
-
+  const {push} = useRouter()
   const handleNext = useCallback(() => {
     if (currentQuiz) {
       if (quizState.current === currentQuiz.questions.length - 1) {
@@ -43,15 +47,29 @@ const QuestionComponent = () => {
       }
     }
   }, [currentQuiz, quizState]);
-  const handleSubmit = useCallback(() => {
-    dispatch(
+  const handleSubmit = useCallback(async() => {
+   const res = await dispatch(
       submitQuiz({
         quizId: currentQuiz?._id||"",
         userId: user?._id||"",
         answers
       })
     );
-  }, [answers, currentQuiz?._id, dispatch, user?._id]);
+
+    if(res.meta.requestStatus === "rejected"){
+      toast.error("Your answers was not submitted successfully")
+    }else{
+      toast.success("Your answers was submitted, check your result page for results")
+      setTimeout(() => {
+        push(`/results`)
+      }, 1000);
+    }
+    
+
+
+  }, [answers, currentQuiz?._id, dispatch, push, user?._id]);
+
+  
 
   if (!currentQuiz) {
     return "loading";
@@ -143,7 +161,9 @@ const QuestionComponent = () => {
               disabled={!answers[quizState.current + 1]}
               onClick={handleSubmit}
             >
-              Submit
+              Submit {
+                loading&&<Loader2/>
+              }
             </Button>
           )}
         </div>
