@@ -4,6 +4,7 @@ import { useAppSelector } from "@/lib/hooks";
 import clsx from "clsx";
 import Link from "next/link";
 import React, { useState } from "react";
+import { Button } from "./ui/button";
 
 const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,6 +22,11 @@ const Navbar: React.FC = () => {
         </Link>
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
+        {
+          user&&user.role==="admin"&&
+          <Link href={"/new"}>
+          <Button>Create New Quiz</Button></Link>
+        }
           <Link href="/" className="text-gray-600 hover:text-gray-800">
             Home
           </Link>
@@ -30,6 +36,7 @@ const Navbar: React.FC = () => {
           <Link href="/results" className="text-gray-600 hover:text-gray-800">
             Results
           </Link>
+          
           {user?<Link href="/account" className="text-gray-600 hover:text-gray-800">
             Account
           </Link>:<Link href="/auth/login" className="bg-gradient-to-br from-neutral-800 to-neutral-500 duration-300 hover:bg-gradient-to-l hover:scale-105 text-white px-3 py-1 rounded-md">
@@ -71,6 +78,11 @@ const Navbar: React.FC = () => {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden mt-2 px-4 duration-200">
+          {
+          user&&user.role==="admin"&&
+          <Link href={"/new"} className="block w-full">
+          <Button className="w-full">Create New Quiz</Button></Link>
+        }
           <Link href="/home" className="block py-2 text-gray-600 hover:text-gray-800">
             Home
           </Link>

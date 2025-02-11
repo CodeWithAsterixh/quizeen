@@ -162,7 +162,7 @@ const QuestionComponent = () => {
               onClick={handleSubmit}
             >
               Submit {
-                loading&&<Loader2/>
+                loading&&<Loader2 className="animate-spin"/>
               }
             </Button>
           )}

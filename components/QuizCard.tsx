@@ -16,7 +16,7 @@ interface QuizCardProps {
 
 const QuizCard: React.FC<QuizCardProps> = ({ quiz }) => {
   return (
-    <Card className="max-w-sm shadow-lg m-4">
+    <Card className="shadow-lg">
       <CardHeader>
         <CardTitle className="text-xl font-bold">{quiz.title}</CardTitle>
       </CardHeader>
