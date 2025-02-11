@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
           <Link href={"/new"} className="block w-full">
           <Button className="w-full">Create New Quiz</Button></Link>
         }
-          <Link href="/home" className="block py-2 text-gray-600 hover:text-gray-800">
+          <Link href="/" className="block py-2 text-gray-600 hover:text-gray-800">
             Home
           </Link>
           <Link href="/about" className="block py-2 text-gray-600 hover:text-gray-800">
