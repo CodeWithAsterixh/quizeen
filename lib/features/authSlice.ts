@@ -77,6 +77,7 @@ export const registerUser = createAsyncThunk<AuthResponse, RegisterPayload>(
   }
 );
 
+
 // Slice for authentication
 const authSlice = createSlice({
   name: "auth",

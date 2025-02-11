@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
   return (
     <footer className={clsx("bg-gray-100 py-4", "border-t border-gray-200")}>
       <div className="container mx-auto px-4 text-center text-sm text-gray-600">
-        <p>&copy; {new Date().getFullYear()} My Quiz App. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Quizeen Quiz taker. All rights reserved.</p>
         <p>
           Built with{" "}
           <a

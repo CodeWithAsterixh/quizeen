@@ -6,9 +6,9 @@ import FAQAccordion, { FAQ } from "@/components/FAQAccordion";
 
 const aboutContent = {
   description:
-    "Welcome to My Quiz App – a platform designed to make learning fun and engaging through a variety of quizzes on different topics.",
+    "Welcome to Quizeen quiz taker – a platform designed to make learning fun and engaging through a variety of quizzes on different topics.",
   developerInfo:
-    "Developed and maintained by [Your Name]. Passionate about creating bug-free, production-grade applications using modern web technologies.",
+    "Developed and maintained by Paul (aka-Asterixh) . Passionate about creating bug-free, production-grade applications using modern web technologies.",
   userCapabilities:
     "Users can take quizzes, view available quizzes on the home page, and manage their account settings such as theme and quiz result saving preferences.",
   limitations:
@@ -44,7 +44,7 @@ const AboutPage: React.FC = () => {
       {/* About Information Card */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">About My Quiz App</CardTitle>
+          <CardTitle className="text-3xl font-bold">About Quizeen</CardTitle>
         </CardHeader>
         <CardContent className="mt-4 space-y-4">
           <p>{aboutContent.description}</p>
