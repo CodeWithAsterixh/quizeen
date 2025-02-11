@@ -24,8 +24,8 @@ interface QuizAttemptDetailsProps {
 
 const QuizAttemptDetails: React.FC<QuizAttemptDetailsProps> = ({ quiz, attempt }) => {
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <Card className="p-6 shadow-md">
+    <div className="max-w-4xl mx-auto">
+      <Card className="p-2 sm:p-6 shadow-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">{quiz.title}</CardTitle>
         </CardHeader>
