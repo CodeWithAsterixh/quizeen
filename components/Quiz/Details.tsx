@@ -1,8 +1,11 @@
 "use client";
 import { useAppSelector } from "@/lib/hooks";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
 
-export default function Details() {
+export default function Details({startQuiz}:{
+  startQuiz:()=>void
+}) {
   const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
 
   return (
@@ -28,6 +31,7 @@ export default function Details() {
           Updated at: {new Date(currentQuiz.updatedAt).toLocaleString()}
         </p>
       )}
+      <Button variant={"success"} className="mt-3" onClick={startQuiz}>Start quiz</Button>
     </CardContent>
   </Card>
   );

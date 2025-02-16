@@ -17,8 +17,17 @@ const buttonVariants = cva(
           "border border-neutral-200 bg-white shadow-sm hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:bg-neutral-800 dark:hover:text-neutral-50",
         secondary:
           "bg-neutral-100 text-neutral-900 shadow-sm hover:bg-neutral-100/80 dark:bg-neutral-800 dark:text-neutral-50 dark:hover:bg-neutral-800/80",
-        ghost: "hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50",
+        ghost:
+          "hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50",
         link: "text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-50",
+        primary:
+          "bg-blue-500 text-white shadow hover:bg-blue-500/90 dark:bg-blue-400 dark:text-white dark:hover:bg-blue-400/90",
+        success:
+          "bg-green-500 text-white shadow hover:bg-green-500/90 dark:bg-green-400 dark:text-white dark:hover:bg-green-400/90",
+        warning:
+          "bg-amber-500 text-white shadow hover:bg-amber-500/90 dark:bg-amber-400 dark:text-white dark:hover:bg-amber-400/90",
+        info:
+          "bg-sky-500 text-white shadow hover:bg-sky-500/90 dark:bg-sky-400 dark:text-white dark:hover:bg-sky-400/90",
       },
       size: {
         default: "h-9 px-4 py-2",
@@ -32,7 +41,8 @@ const buttonVariants = cva(
       size: "default",
     },
   }
-)
+);
+
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,

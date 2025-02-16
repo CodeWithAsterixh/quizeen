@@ -7,17 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { deleteAccount, logout, updateUserProfile } from "@/lib/features/authSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
 import { LogOut } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
 const AccountPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+  const {toast} = useToast()
 
   // Local state to manage form editing
   const [fullName, setFullName] = useState(user?.fullName || "");
@@ -40,11 +41,19 @@ const AccountPage: React.FC = () => {
       await dispatch(
         updateUserProfile({ fullName, email, id: user?._id||"" })
       ).unwrap();
-      toast.success("Profile updated!");
+      toast({
+        variant:"success",
+        title:"Update info",
+        description:"Profile updated successfully!"
+      });
       setEditing(false);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      toast.error("Failed to update profile.");
+      toast({
+        variant:"destructive",
+        title:"Update info",
+        description:"something went wrong, Failed to update profile.",
+      });
     }
   };
 

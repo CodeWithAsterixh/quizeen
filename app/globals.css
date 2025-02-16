@@ -4,23 +4,55 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
 @layer base {
   :root {
     --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
+@keyframes bounceHorizontal {
+  0%, 100% {
+      transform: translateX(-25%);
+      animation-timing-function: cubic-bezier(0.8,0,1,1);
+  }
+  50% {
+      transform: none;
+      animation-timing-function: cubic-bezier(0,0,0.2,1);
+  }
+}
 *{
   @apply box-border
 }
 
+button{
+  @apply active:scale-95 !duration-300
+}
 .scrollbar::-webkit-scrollbar{
-  @apply bg-transparent w-2 h-2
+  @apply bg-transparent w-2 h-2 cursor-pointer
 }
 .scrollbar::-webkit-scrollbar-thumb{
-  @apply bg-neutral-400 rounded-full
+  @apply bg-neutral-400 rounded-full cursor-grab active:cursor-grabbing
 }
 .scrollbar::-webkit-scrollbar-corner{
   @apply bg-transparent

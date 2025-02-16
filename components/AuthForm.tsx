@@ -3,18 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import { loginUser, registerUser } from "@/lib/features/authSlice"; // Async thunks from our auth slice
 import { useAppDispatch } from "@/lib/hooks";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 
 interface AuthFormProps {
   type: "login" | "register"; // Distinguishes between login and registration modes
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
+  const {toast} = useToast()
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,10 +60,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
 
   useEffect(() => {
     if(error.trim() !== ""){
-      toast.error(error)
+      toast({
+        variant:"destructive",
+        description:error
+      })
     }
 
-  }, [error])
+  }, [error, toast])
   
   return (
     <div className="w-96 max-w-md mx-auto p-6 rounded-lg shadow-lg bg-white">

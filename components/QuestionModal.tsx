@@ -1,9 +1,10 @@
+"use client"
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Question } from "@/types";
 import clsx from "clsx";
 import { Trash } from "lucide-react";
 import React, { useState } from "react";
-import toast from "react-hot-toast";
 import UseModal from "./Modal";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
@@ -12,6 +13,8 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Textarea } from "./ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { ToastViewport } from "./ui/toast";
 
 type Props = {
   
@@ -31,6 +34,7 @@ export default function QuestionModal({
   actions,
   questionFill
 }: Props) {
+  const {toast} = useToast()
   const [question, setQuestion] = useState<Question>(questionFill||{
     _id: Math.random().toString(36).substr(2, 9),
     text: "",
@@ -48,7 +52,10 @@ export default function QuestionModal({
   
     // Validate that the question text and correct answer are provided.
     if (question.text.trim() === "" || question.correctAnswer.trim() === "") {
-      toast.error("Please fill in the question text and select the correct answer");
+      toast({
+        variant:"warning",
+        description:"Please fill in the question text and select the correct answer",
+      });
       return;
     }
   
@@ -58,13 +65,18 @@ export default function QuestionModal({
     );
   
     if (emptyOption) {
-      toast.error("Please fill all options");
+      toast({
+        variant:"warning",
+        description:"Please fill all options",
+      });
       return;
     }
   
     // All validations pass.
-    toast.success("Question saved successfully");
-    
+    toast({
+      variant:"success",
+      description:"Question saved successfully"
+    });
     if(actions?.handleQuestionSave){
         actions?.handleQuestionSave(question);
        
@@ -78,13 +90,14 @@ export default function QuestionModal({
   };
   
   return (
+    <>
     <UseModal
       trigger={trigger}
       contentHeader={{
         title: "Add new question"
       }}
       others={
-          <Card key={index} className="p-4 border flex flex-col gap-2">
+          <Card key={index} className="w-[80vw] p-4 border flex flex-col gap-2">
             <div>
               <Label>Question {index + 1}</Label>
               <Textarea
@@ -164,5 +177,7 @@ export default function QuestionModal({
           </Card>
       }
     />
+    <ToastViewport position="top-left" />
+    </>
   );
 }

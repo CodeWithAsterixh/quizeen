@@ -8,13 +8,16 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const QuestionComponent = () => {
+  const {toast} = useToast()
+
   const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
   const {loading} = useAppSelector((s) => s.quiz);
   const user = useAppSelector((s) => s.auth.user);
+  
   const [quizState, setQuizState] = useState({
     current: 0,
     status: "not-finished" as "not-finished" | "finished",
@@ -57,9 +60,15 @@ const QuestionComponent = () => {
     );
 
     if(res.meta.requestStatus === "rejected"){
-      toast.error("Your answers was not submitted successfully")
+      toast({
+        variant:"destructive",
+        description:"Your answers was not submitted successfully"
+      })
     }else{
-      toast.success("Your answers was submitted, check your result page for results")
+      toast({
+        variant:"success",
+        description:"Your answers was submitted, check your result page for results"
+      })
       setTimeout(() => {
         push(`/results`)
       }, 1000);
@@ -75,16 +84,16 @@ const QuestionComponent = () => {
     return "loading";
   }
   return (
-    <Card className="w-full bg-neutral-200 p-5">
-      <CardHeader>
+    <Card className="w-full bg-neutral-200 p-2 sm:p-5">
+      <CardHeader className="p-2 sm:p-6">
         <CardTitle className="text-xl font-semibold">
           {quizState.current + 1}.{" "}
           {currentQuiz.questions[quizState.current].text}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2 sm:p-6">
         <RadioGroup
-          className="grid grid-cols-2"
+          className="grid grid-cols-1 sm:grid-cols-2"
           value={answers[quizState.current + 1]}
         >
           {Object.entries(currentQuiz.questions[quizState.current].options).map(
@@ -118,7 +127,7 @@ const QuestionComponent = () => {
                       "bg-white border-white outline-none"
                   )}
                 />
-                <Label htmlFor={key}>{value as string}</Label>
+                <Label htmlFor={key} className="break-all">{value as string}</Label>
               </div>
             )
           )}

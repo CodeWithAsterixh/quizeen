@@ -8,13 +8,15 @@ import { useAppDispatch } from "@/lib/hooks";
 import { Question } from "@/types";
 import { PencilLine, Plus, Trash2Icon } from "lucide-react";
 import { useState } from "react";
-import toast from "react-hot-toast";
 import UseModal from "./Modal";
 import QuestionModal from "./QuestionModal";
 import { DialogClose } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AddQuizForm() {
+  const {toast} = useToast()
+
   const [quiz, setQuiz] = useState({
     title: "",
     description: "",
@@ -37,10 +39,14 @@ export default function AddQuizForm() {
     });
   };
   const handleRemoveQuestion = (index: number) => {
-    setQuiz((prev) => ({
-      ...prev,
-      questions: prev.questions.filter((_, i) => i !== index),
-    }));
+    // setQuiz((prev) => ({
+    //   ...prev,
+    //   questions: prev.questions.filter((_, i) => i !== index),
+    // }));
+    toast({
+      variant:"info",
+      description:`Question ${index+1} has been deleted sucessfully`
+    })
   };
 
   const handleChange = (field: string, value: any) => {
@@ -50,22 +56,35 @@ export default function AddQuizForm() {
   const handleSubmit = async ()=>{
     const {description,duration,questions,title} = quiz
     if(title.trim()===""){
-      toast.error("Title is required")
+      toast({
+        variant:"warning",
+        description:"Title is required",
+
+      })
       return
     }
     if(duration.trim()===""){
-      toast.error("Test duration is required")
+      toast({
+        variant:"warning",
+        description:"Test duration is required"
+      })
       return
     }
     if(description.trim()===""){
-      toast.error("Description is required")
+      toast({
+        variant:"warning",
+        description:"Description is required"
+      })
       return
     }
     if(questions.length<5){
-      toast.error("Questions are required (at least 5)")
+      toast({
+        variant:"warning",
+        description:"Questions are required (at least 5)"
+      })
       return
     }
-    toast.success("well done, you can save test")
+    
     const createdBy = "Admin Asterixh"
     const createdAt = new Date().toISOString()
     const updatedAt = new Date().toISOString()
@@ -77,14 +96,24 @@ export default function AddQuizForm() {
       createdAt,
       updatedAt,
       _id:""
-    }))
+    })).then(()=>{
+      toast({
+        variant:"success",
+        description:"Test added"
+      })
+    }).catch(()=>{
+      toast({
+        variant:"destructive",
+        description:"Something went wrong"
+      })
+    })
 
 
   }
 
 
   return (
-    <Card>
+    <Card className="max-w-4xl mx-auto">
       <CardContent className="space-y-4 p-4">
         <h2 className="text-xl font-semibold">Add New Quiz</h2>
         <div>
