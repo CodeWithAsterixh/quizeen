@@ -1,5 +1,6 @@
 "use client";
 
+import LogOutModal from "@/components/LogOutModal";
 import UseModal from "@/components/Modal";
 import SettingsDropdown from "@/components/SettingsDropdown";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { deleteAccount, logout, updateUserProfile } from "@/lib/features/authSlice";
+import { deleteAccount, updateUserProfile } from "@/lib/features/authSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import { RootState } from "@/lib/store";
 import { LogOut } from "lucide-react";
@@ -59,9 +60,6 @@ const AccountPage: React.FC = () => {
 
   const handleDelete = () => {
     dispatch(deleteAccount({ email }));
-  };
-  const handleLogout = () => {
-    dispatch(logout());
   };
 
   return (
@@ -144,30 +142,9 @@ const AccountPage: React.FC = () => {
         </div>
 
         
-        <UseModal
-          trigger={<Button variant={"secondary"}><LogOut/> logout</Button>}
-          contentHeader={{
-            title: "Delete Account",
-            description: <strong>
-              Are you sure you want to Log out your account?<br/>Your info won{"'"}t be saved!
-            </strong>,
-          }}
-          contentFooter={{
-            children: (
-              <div className="w-full flex flex-col gap-3">
-                <DialogClose asChild>
-                  <Button variant={"default"}>Cancel</Button>
-                </DialogClose>
-                <Button
-                  variant={"secondary"}
-                  onClick={handleLogout} 
-                >
-                  Yes, Log out
-                </Button>
-              </div>
-            ),
-          }}
-        ></UseModal>
+        <LogOutModal trigger={
+          <Button variant={"secondary"}><LogOut/> logout</Button>
+        }/>
         </div>
       )}
     </div>

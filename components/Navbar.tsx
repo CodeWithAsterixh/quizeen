@@ -2,7 +2,7 @@
 
 import { useAppSelector } from "@/lib/hooks";
 import clsx from "clsx";
-import { LogOut, Plus } from "lucide-react";
+import { LogInIcon, LogOut, Plus } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import LogOutModal from "./LogOutModal";
@@ -175,15 +175,16 @@ const Navbar: React.FC = () => {
                   />
                 </SidebarGroupContent>
               ) : (
-                <SidebarGroupContent className="bg-neutral-300 rounded-md p-2 flex gap-2 items-center justify-center">
+                <SidebarGroupContent className="bg-neutral-800 rounded-md p-2 flex gap-2 items-center justify-center">
                   <Link
                     href="/auth/login"
-                    className="block w-w-full py-2 px-3 rounded-md bg-neutral-800 text-white"
+                    className="w-full py-2 px-3 rounded-md  text-white flex items-center gap-2"
                   >
-                    Sign in
+                   <LogInIcon className="size-5"/> Sign in
                   </Link>
                 </SidebarGroupContent>
               )}
+              
             </SidebarGroup>
           </SidebarFooter>
         </Sidebar>
