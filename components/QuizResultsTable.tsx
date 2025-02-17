@@ -2,8 +2,6 @@ import { Quiz, QuizAttempt } from "@/types";
 import api from "@/utils/api";
 import { useEffect, useState } from "react";
 import { LoaderIcon } from "react-hot-toast";
-import UseModal from "./Modal";
-import QuizAttemptDetails from "./QuizAttemptsDetails";
 import {
   TableBody,
   TableCell,
@@ -11,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { useRouter } from "next/navigation";
 
 interface QuizResultsTableProps {
   results: QuizAttempt[];
@@ -18,6 +17,7 @@ interface QuizResultsTableProps {
 
 export default function QuizResultsTable({ results }: QuizResultsTableProps) {
   const [quiz, setQuiz] = useState<Quiz[]>([]);
+  const { push } = useRouter();
 
   const getQuizzes = async (id: string) => {
     const res = await api.get(`/quizzes/${id}`);
@@ -31,6 +31,10 @@ export default function QuizResultsTable({ results }: QuizResultsTableProps) {
       });
     });
   }, [results]);
+
+  function handleRoute(id: string) {
+    push(`/results/${id}`);
+  }
 
   return (
     <div className="overflow-x-auto scrollbar">
@@ -56,38 +60,33 @@ export default function QuizResultsTable({ results }: QuizResultsTableProps) {
         </TableHeader>
         <TableBody>
           {results.map((result, ind) => (
-            <UseModal
-              key={ind}
-              trigger={
-                <TableRow key={result._id} className="hover:bg-gray-50 cursor-pointer">
-                  <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                    {quiz.length > 0 && quiz[ind]?.title ? (
-                      quiz[ind].title
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <LoaderIcon className="animate-spin"></LoaderIcon>
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                    {result.score}
-                  </TableCell>
-                  <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                    {result.totalQuestions}
-                  </TableCell>
-                  <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                    {result.completionTime}
-                  </TableCell>
-                  <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                    {new Date(result.createdAt).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              }
-              contentHeader={{
-                title: "Quiz Details",
-              }}
-              others={<QuizAttemptDetails quiz={quiz[ind]} attempt={result} />}
-            />
+            <TableRow
+              key={result._id}
+              onClick={()=>handleRoute(result._id)}
+              className="hover:bg-gray-50 cursor-pointer"
+            >
+              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                {quiz.length > 0 && quiz[ind]?.title ? (
+                  quiz[ind].title
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <LoaderIcon className="animate-spin"></LoaderIcon>
+                  </div>
+                )}
+              </TableCell>
+              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                {result.score}
+              </TableCell>
+              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                {result.totalQuestions}
+              </TableCell>
+              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                {result.completionTime}
+              </TableCell>
+              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                {new Date(result.createdAt).toLocaleString()}
+              </TableCell>
+            </TableRow>
           ))}
 
           {results.length === 0 && (

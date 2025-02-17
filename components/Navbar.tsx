@@ -21,6 +21,7 @@ import {
 } from "./ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import UserAccountDropDown from "./UserAccountDropDown";
+import Image from "next/image";
 
 const Navbar: React.FC = () => {
   const user = useAppSelector((s) => s.auth.user);
@@ -29,10 +30,13 @@ const Navbar: React.FC = () => {
 
 
   return (
-    <nav className={clsx("bg-white shadow-md", "px-4 py-2", "sticky top-0")}>
+    
+    <>
+    <nav className={clsx("bg-white shadow-md z-10", "px-4 py-2", "sticky top-0")}>
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo / Brand */}
-        <Link href="/" className="text-xl font-bold text-gray-800">
+        <Link href="/" className="text-xl font-bold text-gray-800 flex items-center gap-1">
+        <Image className="size-7" src={"/assets/icon.svg"} alt="quizeen icon" width={100} height={100} loading="lazy"/>
           Quizeen
         </Link>
         {/* Desktop Menu */}
@@ -72,14 +76,20 @@ const Navbar: React.FC = () => {
           )}
         </div>
         {/* Mobile Menu Toggle */}
-        {isMobile && <SidebarTrigger className="size-6 *:!size-full" />}
+        {isMobile && <SidebarTrigger className="size-6 *:!size-6" />}
       </div>
       {/* Mobile Menu */}
-      {isMobile && (
+      
+    </nav>
+    {isMobile && (
         <Sidebar>
           <SidebarHeader>
-            <SheetTitle className="text-xl">Quizeen</SheetTitle>
+            <SheetTitle className="text-xl flex items-center gap-1">
+        <Image className="size-7" src={"/assets/icon.svg"} alt="quizeen icon" width={100} height={100} loading="lazy"/>
+              
+              Quizeen</SheetTitle>
             <SheetDescription className="hidden">
+              
               Quiz Platform
             </SheetDescription>
           </SidebarHeader>
@@ -178,7 +188,7 @@ const Navbar: React.FC = () => {
           </SidebarFooter>
         </Sidebar>
       )}
-    </nav>
+    </>
   );
 };
 

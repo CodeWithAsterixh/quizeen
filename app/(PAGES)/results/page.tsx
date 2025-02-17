@@ -20,6 +20,7 @@ export default function Page() {
     
     
     
+    
   return (
     <div className='w-full px-2 sm:max-w-5xl m-auto py-5 flex flex-col gap-4'>
         <QuizResultsTable results={userCompleted} />

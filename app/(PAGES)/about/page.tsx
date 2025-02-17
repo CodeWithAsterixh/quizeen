@@ -17,9 +17,9 @@ const aboutContent = {
 
 const faqs: FAQ[] = [
   {
-    question: "What is My Quiz App?",
+    question: "What is Quizeen?",
     answer:
-      "My Quiz App is an interactive platform where you can test your knowledge with quizzes featuring multiple-choice questions.",
+      "Quizeen is an interactive platform where you can test your knowledge with quizzes featuring multiple-choice questions.",
   },
   {
     question: "How do I register or login?",
@@ -34,7 +34,7 @@ const faqs: FAQ[] = [
   {
     question: "What kind of quizzes are available?",
     answer:
-      "The app offers quizzes with options limited to A-D answers, focusing on a streamlined and easy-to-understand format.",
+      "The app offers varieties of course quizzes with options limited to A-D answers, focusing on a streamlined and easy-to-understand format.",
   },
 ];
 

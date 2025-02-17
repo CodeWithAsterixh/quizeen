@@ -62,6 +62,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full">
       <Navbar />
+      
       <main className="w-full h-fit min-h-screen">{children}</main>
       <Footer />
     </div>

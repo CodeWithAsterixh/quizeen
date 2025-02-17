@@ -56,7 +56,7 @@ export const getResults = createAsyncThunk<QuizAttempt[], string>(
   "quiz/getresults",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await api.get<QuizAttempt[]>(`/results/${userId}`);
+      const response = await api.get<QuizAttempt[]>(`/results?uid=${userId}`);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Failed to submit quiz");

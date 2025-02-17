@@ -39,7 +39,7 @@ const QuizCard: React.FC<QuizCardProps> = ({ quiz }) => {
       <CardFooter className="flex items-center gap-2 flex-wrap">
         
         {
-          isDone?<Link href={`/results`}>
+          isDone?<Link href={`/results/${userCompleted.find(q=>q.quizId===quiz._id)?._id}`}>
           <Button variant="success">
             See results
           </Button>
