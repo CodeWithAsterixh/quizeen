@@ -6,10 +6,10 @@ import { useSidebar } from './ui/sidebar'
 
 export default function ResetSideBarState() {
     const pathname = usePathname()
-    const {setOpen} = useSidebar()
+    const {setOpenMobile} = useSidebar()
     useEffect(() => {
-        setOpen(false)
-    }, [pathname, setOpen])
+      setOpenMobile(false)
+    }, [pathname, setOpenMobile])
     
   return (
    null

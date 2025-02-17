@@ -29,7 +29,7 @@ export default function LogOutModal({trigger}: Props) {
           }}
           contentFooter={{
             children: (
-              <div className="w-full flex flex-col gap-3">
+              <div className="w-[20rem] max-w-full flex flex-col gap-3">
                 <DialogClose asChild>
                   <Button variant={"default"}>Cancel</Button>
                 </DialogClose>
