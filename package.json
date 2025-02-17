@@ -36,6 +36,7 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.1",
     "react-redux": "^9.2.0",
+    "react-to-pdf": "^1.0.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7"
   },

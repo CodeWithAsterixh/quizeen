@@ -66,11 +66,13 @@ export interface QuizAttempt {
 }
 
 // redux-state.interface.ts
+export type userRoles = "user"|"guest"|"admin"|"none"
 export interface AuthState {
   user: User | null;
   token: string | null;
   loading: boolean;
   error: string | null;
+  role:userRoles
 }
 
 export interface QuizState {
@@ -97,8 +99,9 @@ export interface QuizResult {
 
 export interface QuestionResultSubmission {
   quizId: string;
-  userId: string;
+  userId?: string;
   answers: Record<number, selectedOptions>;
+  role:userRoles
 }
 
 export interface QuestionResult {

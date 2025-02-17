@@ -1,26 +1,23 @@
-import { NextResponse } from "next/server";
-import { Quiz } from "@/models/Quiz";
-import { User } from "@/models/User";
-import { QuizResult } from "@/models/QuizResult";
 import { connectToDatabase } from "@/lib/mongo";
-import { details } from "@/types";
+import { Quiz } from "@/models/Quiz";
+import { QuizResult } from "@/models/QuizResult";
+import { details, QuestionResultSubmission, QuizAttempt } from "@/types";
+import { NextResponse } from "next/server";
 
 // POST /api/quizzes/submit
 export async function POST(req: Request) {
   await connectToDatabase()
   
   try {
-    const { quizId, userId, answers } = await req.json();
+    const { quizId, userId, answers, role } = await req.json() as QuestionResultSubmission;
           
       // Access the quizId from params
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return NextResponse.json({ message: "Quiz not found" }, { status: 404 });
     }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    if (role === "none") {
+      return NextResponse.json({ message: "Not allowed" }, { status: 404 });
     }
 
     let score = 0;
@@ -35,17 +32,31 @@ export async function POST(req: Request) {
         correctAnswer: question.correctAnswer,
         isCorrect,
         timeTaken: "00:30", // This can be added as part of the submission process
-      };
+      }
     });
-
-
-    const result = new QuizResult({
+    const resultWithoutUser:QuizAttempt = {
       quizId,
-      userId,
       score,
+      userId:"",
       totalQuestions: quiz.questions.length,
       details,
       completionTime: "15:00", // Example time; can be captured in the frontend
+      _id:quizId,
+      correctAnswers:details.filter(d=>d.isCorrect).length,
+      createdAt: (new Date()).toISOString()
+    }
+
+
+
+    
+    if(role==="guest"){
+    return NextResponse.json(resultWithoutUser);
+
+    }
+
+    const result = new QuizResult({
+      ...resultWithoutUser,
+      userId
     });
 
     await result.save();

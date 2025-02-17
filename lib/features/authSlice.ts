@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { AuthState, AuthResponse, LoginPayload, RegisterPayload } from "@/types";
+import { AuthState, AuthResponse, LoginPayload, RegisterPayload, userRoles } from "@/types";
 import api from "@/utils/api";
 
 // Initial state for authentication
@@ -9,6 +9,7 @@ const initialState: AuthState = {
   token: null,
   loading: false,
   error: null,
+  role:"none"
 };
 
 // Async thunk for getting user profile
@@ -88,6 +89,9 @@ const authSlice = createSlice({
       state.token = null;
       localStorage.removeItem("token");
     },
+    setRole:(state, action:{payload:userRoles})=>{
+      state.role = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -166,5 +170,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout,setRole } = authSlice.actions;
 export default authSlice.reducer;

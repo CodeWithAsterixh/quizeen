@@ -24,7 +24,7 @@ import UserAccountDropDown from "./UserAccountDropDown";
 import Image from "next/image";
 
 const Navbar: React.FC = () => {
-  const user = useAppSelector((s) => s.auth.user);
+  const {user,role} = useAppSelector((s) => s.auth);
   const { isMobile } = useSidebar();
   const userAvatarFallback = `${user?.fullName.split(" ")[0].charAt(0)}${user?.fullName.split(" ").slice(-1)[0].charAt(0)}`
 
@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
         </Link>
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
-          {user && user.role === "admin" && (
+          {user && role === "admin" && (
             <Link href={"/new"}>
               <Button>Create New Quiz</Button>
             </Link>
@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
             About
           </Link>
 
-          {user ? (
+          {role=="admin"||role=="user" ? (
             <>
               <Link
                 href="/results"
@@ -119,7 +119,7 @@ const Navbar: React.FC = () => {
                   About
                 </Link>
               </SidebarGroupContent>
-              {user && (
+              {role=="admin"||role=="user" && (
                 <SidebarGroupContent className="bg-neutral-100 rounded-md">
                   <Link
                     href="/results"
@@ -131,7 +131,7 @@ const Navbar: React.FC = () => {
             )}
             </SidebarGroup>
 
-            {user &&user.role==="admin" && (
+            {user &&role==="admin" && (
               <SidebarGroup>
                 <SidebarGroupContent className="bg-neutral-900 hover:bg-neutral-800 rounded-md">
                   <Link

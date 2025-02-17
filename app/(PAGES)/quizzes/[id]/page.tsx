@@ -51,7 +51,9 @@ export default function Page() {
       {!quizTiming.started && (
         <>
           <GoBack to="/" />
-          <Details  startQuiz={handleStartQuiz}/>
+          {
+           currentQuiz&& <Details startQuiz={handleStartQuiz}/>
+          }
         </>
       )}
      

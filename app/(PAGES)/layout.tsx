@@ -2,7 +2,7 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { getUserProfile } from "@/lib/features/authSlice";
+import { getUserProfile, setRole } from "@/lib/features/authSlice";
 import { getResults } from "@/lib/features/quizSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import Image from "next/image";
@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const dispatch = useAppDispatch();
-  const { user, loading, error } = useAppSelector((state) => state.auth);
+  const { user, loading, error,role } = useAppSelector((state) => state.auth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Ensures proper loading before rendering
 
   useEffect(() => {
@@ -29,15 +29,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (user) {
       dispatch(getResults(user._id));
+      dispatch(setRole(user.role))
     }
   }, [dispatch, user]);
+
+  function handleGuest(){
+    dispatch(setRole("guest"))
+    console.log(role)
+  }
+  
+
 
 
 
  
 
   // Show loader while checking authentication
-  if ((isCheckingAuth || loading) && !path.includes("auth")) {
+  if ((isCheckingAuth || loading) && !path.includes("auth") && role=="none") {
     return (
       <div className="fixed py-5 px-2 inset-0 w-full h-full flex items-center justify-end flex-col gap-0">
         <Image
@@ -59,7 +67,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   if (
-    (!loading &&
+    role=="none"&& (!loading &&
     !user &&
     !path.includes("auth") &&
     !localStorage.getItem("token"))||
@@ -67,7 +75,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ) {
     return(
       <div className="fixed py-5 px-2 inset-0 w-full h-full flex items-center justify-end flex-col gap-0">
-      <div className="w-fit absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-10">
+      <div className="w-96 p-5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-10">
       <Image
         className="size-32"
         src={"/assets/icon.svg"}
@@ -77,19 +85,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         loading="lazy"
       />
 
-     <div className="w-full flex flex-col gap-4 items-center animate-reveal">
+     <div className="w-full flex flex-col gap-4 items-center animate-reveal p-4">
       <div className="w-full flex flex-col items-center gap-2">
       <h1 className="text-2xl font-bold">Welcome to Quizeen</h1>
       <p className="text-sm text-neutral-500">Walk the path of knowledge</p>
       </div>
-     <div className="w-full flex items-center justify-between gap-2">
-        <Link href="/auth/register">
-        <Button variant="default" className="min-w-28">Register</Button>
+     <div className="w-full flex items-center justify-center gap-3 flex-col min-[498px]:flex-row">
+        <Link href="/auth/register" className="min-w-28 w-full max-w-72">
+        <Button variant="default" className="w-full">Register</Button>
         </Link>
-        <Link href="/auth/login">
-        <Button variant="outline" className="min-w-28">Login</Button>
+        <Link href="/auth/login" className="min-w-28 w-full max-w-72">
+        <Button variant="outline" className="w-full">Login</Button>
         </Link>
+        
       </div>
+      <Button onClick={handleGuest} variant="ghost" className="min-w-28 w-full">Continue as guest</Button>
+
      </div>
       </div>
 

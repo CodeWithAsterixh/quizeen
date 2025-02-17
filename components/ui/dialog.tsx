@@ -6,7 +6,33 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const Dialog = DialogPrimitive.Root
+type DialogProps = React.ComponentPropsWithoutRef<
+  typeof DialogPrimitive.Root
+> & {
+  /**
+   * Callback fired when the dialog is closed.
+   */
+  onClose?: () => void
+}
+
+// Wrap DialogPrimitive.Root to intercept onOpenChange and call onClose when closed.
+const Dialog = React.forwardRef<
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>,
+  DialogProps
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+>(({ onClose, onOpenChange, ...props }, ref) => {
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      onClose?.()
+    }
+    onOpenChange?.(open)
+  }
+
+  return (
+    <DialogPrimitive.Root {...props} onOpenChange={handleOpenChange} />
+  )
+})
+Dialog.displayName = "Dialog"
 
 const DialogTrigger = DialogPrimitive.Trigger
 
@@ -21,7 +47,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -87,10 +113,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn(
-      "text-lg font-semibold leading-none tracking-tight",
-      className
-    )}
+    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
     {...props}
   />
 ))

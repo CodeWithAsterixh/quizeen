@@ -8,11 +8,11 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
     const [shown, setShown] = React.useState(false)
     if(type === "password"){
       return(
-        <div className="w-full flex items-center justify-center gap-2">
+        <div className="w-full flex items-center justify-center relative">
           <input
         type={shown?"text":"password"}
         className={cn(
-          "flex h-9 w-full rounded-md border border-neutral-200 bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-neutral-950 placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:border-neutral-800 dark:file:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus-visible:ring-neutral-300",
+          "flex h-9 w-full !pr-10 rounded-md border border-neutral-200 bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-neutral-950 placeholder:text-neutral-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:border-neutral-800 dark:file:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus-visible:ring-neutral-300",
           className
         )}
         ref={ref}
@@ -20,7 +20,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
       />
       <span onClick={()=>{
         setShown(!shown)
-      }} className="w-10 flex items-center justify-center cursor-pointer text-neutral-500 hover:text-neutral-700 duration-300">
+      }} className="w-10 h-full absolute right-0 top-0 flex items-center justify-center cursor-pointer text-neutral-500 hover:text-neutral-700 duration-300">
         {shown?<EyeClosed/>:<Eye/> }
       </span>
         </div>

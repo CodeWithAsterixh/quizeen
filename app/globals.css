@@ -50,7 +50,7 @@ body {
   }
 }
 *{
-  @apply box-border
+  @apply box-border outline-none
 }
 
 button{
