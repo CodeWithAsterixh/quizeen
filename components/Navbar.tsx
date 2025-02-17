@@ -178,7 +178,7 @@ const Navbar: React.FC = () => {
                 <SidebarGroupContent className="bg-neutral-300 rounded-md p-2 flex gap-2 items-center justify-center">
                   <Link
                     href="/auth/login"
-                    className="block py-2 px-3 rounded-md bg-neutral-800 text-white"
+                    className="block w-w-full py-2 px-3 rounded-md bg-neutral-800 text-white"
                   >
                     Sign in
                   </Link>
