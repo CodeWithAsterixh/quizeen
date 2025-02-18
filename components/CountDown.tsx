@@ -3,10 +3,11 @@
 
 import React, { useState, useEffect } from "react";
 import { Timer } from "lucide-react";
+import { selectedOptions } from "@/types";
 
 interface MinuteCountdownProps {
   minutes: number;
-  setEnd:(end:boolean)=>void
+  setEnd:(end:boolean, answers:Record<number, selectedOptions>)=>void
 }
 
 export function MinuteCountdown({ minutes,setEnd }: MinuteCountdownProps) {
@@ -20,7 +21,7 @@ export function MinuteCountdown({ minutes,setEnd }: MinuteCountdownProps) {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          setEnd(true)
+          setEnd(true,{})
           return 0;
         }
         return prev - 1;

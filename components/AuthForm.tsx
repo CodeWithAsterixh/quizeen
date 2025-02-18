@@ -6,15 +6,19 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { loginUser, registerUser } from "@/lib/features/authSlice"; // Async thunks from our auth slice
 import { useAppDispatch } from "@/lib/hooks";
+import { AuthResponse } from "@/types";
+import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 interface AuthFormProps {
   type: "login" | "register"; // Distinguishes between login and registration modes
+  intercept?:true;
+  onSuccess?:(res:AuthResponse)=>void
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
+const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
   const {toast} = useToast()
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,12 +30,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  const callSuccess = useCallback(
+    (res:AuthResponse) => {
+      if(intercept){
+        if(onSuccess){
+          onSuccess(res)
+        }
+      }else{
+        router.push("/");
+      }
+    },
+    [intercept, onSuccess, router],
+  )
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true)
-
-
     // Validate password match for registration
     if (type === "register" && password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -42,38 +56,48 @@ const AuthForm: React.FC<AuthFormProps> = ({ type }) => {
     try {
       if (type === "login") {
         // Dispatch the login async thunk and unwrap the result
-        await dispatch(loginUser({ email, password })).unwrap();
-        router.push("/"); // Redirect to home on successful login
+        const res = await dispatch(loginUser({ email, password })).unwrap();
+        callSuccess(res)
       } else {
         // Dispatch the register async thunk and unwrap the result
         await dispatch(registerUser({ fullName, email, password, confirmPassword })).unwrap();
-        await dispatch(loginUser({ email, password })).unwrap();
-        router.push("/"); // Redirect to login page after successful registration
+        const res = await dispatch(loginUser({ email, password })).unwrap();
+
+        callSuccess(res)
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err || "An error occurred. Please try again.");
+      console.log(err)
     }finally{
       setLoading(false)
     }
   };
 
   useEffect(() => {
-    if(error.trim() !== ""){
+    if(typeof error == "string"&&error.trim() !== ""){
       toast({
         variant:"destructive",
-        description:error
+        description:`${error}`
       })
     }
 
   }, [error, toast])
   
   return (
-    <div className="w-96 max-w-md mx-auto p-6 rounded-lg shadow-lg bg-white">
-      <h2 className="text-2xl font-semibold mb-4">
+    <div className={
+      clsx(
+        "w-96 max-w-md mx-auto p-6 rounded-lg bg-white",
+        intercept?"shadow-none":"shadow-lg"
+      )
+    }>
+      
+      {
+        !intercept&&<h2 className="text-2xl font-semibold mb-4">
         {type === "login" ? "Login" : "Register"}
       </h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+      }
+      {error && <p className="text-red-500 mb-4">{`${error}`}</p>}
       <form onSubmit={handleSubmit}>
         {type === "register" && (
           <div className="mb-4">

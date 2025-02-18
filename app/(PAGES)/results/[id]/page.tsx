@@ -1,19 +1,24 @@
 "use client";
 
 import Loader from "@/components/loader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import ResultComponent from "@/components/ResultComponent";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useAppSelector } from "@/lib/hooks";
 import { Quiz, QuizAttempt } from "@/types";
 import api from "@/utils/api";
+import { DownloadIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { usePDF } from "react-to-pdf";
 
 export default function Page() {
   const { id } = useParams<{ id: string }>();
-  const user = useAppSelector(s=>s.auth.user);
+  const user = useAppSelector((s) => s.auth.user);
   const [attempt, setAttempt] = useState<QuizAttempt>();
   const [quiz, setQuiz] = useState<Quiz>();
+  const { targetRef, toPDF } = usePDF();
+  const isMobile = useIsMobile();
 
   const findQuizResult = useCallback(async () => {
     try {
@@ -33,6 +38,21 @@ export default function Page() {
     }
   }, [id]);
 
+  function handlePDF() {
+    toPDF({
+      canvas: {
+        mimeType: "image/png",
+      },
+      filename: `${quiz?.title}-(result)`,
+      resolution: 3,
+      method: "save",
+      page: {
+        format: "letter",
+        margin: isMobile ? 30 : 20,
+      },
+    });
+  }
+
   useEffect(() => {
     findQuizResult();
   }, [findQuizResult]);
@@ -40,72 +60,24 @@ export default function Page() {
   if (!quiz || !attempt) {
     return <Loader />;
   }
-  if(user?._id!==attempt.userId){
-    return null
+  if (user?._id !== attempt.userId) {
+    return null;
   }
 
-
   return (
-    <div className="w-full px-2 sm:max-w-5xl m-auto py-5 flex flex-col gap-4 isolate z-0 relative">
-      <div className="w-full mx-auto">
-      <Card className="p-2 sm:p-6 shadow-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">{quiz.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {quiz.description && (
-            <p className="text-gray-600">{quiz.description}</p>
-          )}
-          <p className="mt-2 text-sm text-gray-500">
-            Duration: {quiz.duration} mins
-          </p>
-          <p className="mt-4 text-lg font-semibold">
-            Score: {attempt.score} / {attempt.totalQuestions}
-          </p>
-          <p className="text-gray-500">Completion Time: {attempt.completionTime}</p>
-          <p className="text-sm text-gray-400">
-            Attempted on: {new Date(attempt.createdAt).toLocaleString()}
-          </p>
-        </CardContent>
-      </Card>
+    <div className="w-full flex flex-col gap-2 py-2">
+      <ResultComponent ref={targetRef} attempt={attempt} quiz={quiz} />
 
-      <div className="mt-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>Question</TableHead>
-              <TableHead>Your Answer</TableHead>
-              <TableHead>Correct Answer</TableHead>
-              <TableHead>Time Taken</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {attempt.details.map((answer, index) => {
-              const question = quiz.questions.find(
-                (q) => q._id === answer.questionId
-              );
-              const isCorrect = answer.userAnswer === answer.correctAnswer;
-              return (
-                <TableRow
-                  key={answer.questionId}
-                  className={isCorrect ? "bg-green-100" : "bg-red-100"}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{question ? question.text : "N/A"}</TableCell>
-                  <TableCell className={isCorrect ? "text-green-600" : "text-red-600"}>
-                    {answer.userAnswer}
-                  </TableCell>
-                  <TableCell>{answer.correctAnswer}</TableCell>
-                  <TableCell>{answer.timeTaken}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+      <div className="w-full flex gap-2 px-2 items-center justify-end">
+        <Button
+          variant="primary"
+          className="flex items-center justify-center gap-2"
+          onClick={handlePDF}
+        >
+          <DownloadIcon />
+          Download as pdf
+        </Button>
       </div>
-
-    </div>
     </div>
   );
 }

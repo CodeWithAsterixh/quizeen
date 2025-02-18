@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { AuthState, AuthResponse, LoginPayload, RegisterPayload, userRoles } from "@/types";
+import {
+  AuthState,
+  AuthResponse,
+  LoginPayload,
+  RegisterPayload,
+  userRoles,
+} from "@/types";
 import api from "@/utils/api";
 
 // Initial state for authentication
@@ -9,7 +15,7 @@ const initialState: AuthState = {
   token: null,
   loading: false,
   error: null,
-  role:"none"
+  role: "none",
 };
 
 // Async thunk for getting user profile
@@ -18,10 +24,12 @@ export const getUserProfile = createAsyncThunk<AuthResponse, void>(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get<AuthResponse>("/auth/profile");
-      
+
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Get user profile failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Get user profile failed"
+      );
     }
   }
 );
@@ -30,25 +38,35 @@ export const deleteAccount = createAsyncThunk<AuthResponse, { email: string }>(
   "auth/deleteAccount",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post<AuthResponse>("/auth/deleteAccount", userData);
+      const response = await api.post<AuthResponse>(
+        "/auth/deleteAccount",
+        userData
+      );
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Profile delete failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Profile delete failed"
+      );
     }
   }
 );
 // Async thunk for updating user profile
-export const updateUserProfile = createAsyncThunk<AuthResponse, { fullName: string; email: string, id:string }>(
-  "auth/updateUserProfile",
-  async (userData, { rejectWithValue }) => {
-    try {
-      const response = await api.put<AuthResponse>("/auth/updateUserProfile", userData);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Profile update failed");
-    }
+export const updateUserProfile = createAsyncThunk<
+  AuthResponse,
+  { fullName: string; email: string; id: string }
+>("auth/updateUserProfile", async (userData, { rejectWithValue }) => {
+  try {
+    const response = await api.put<AuthResponse>(
+      "/auth/updateUserProfile",
+      userData
+    );
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.message || "Profile update failed"
+    );
   }
-);
+});
 
 // Async thunk for user login
 export const loginUser = createAsyncThunk<AuthResponse, LoginPayload>(
@@ -73,11 +91,12 @@ export const registerUser = createAsyncThunk<AuthResponse, RegisterPayload>(
       localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Registration failed");
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed"
+      );
     }
   }
 );
-
 
 // Slice for authentication
 const authSlice = createSlice({
@@ -87,11 +106,12 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.role = "none";
       localStorage.removeItem("token");
     },
-    setRole:(state, action:{payload:userRoles})=>{
+    setRole: (state, action: { payload: userRoles }) => {
       state.role = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -100,11 +120,15 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.loading = false;
-      })
+      .addCase(
+        loginUser.fulfilled,
+        (state, action: PayloadAction<AuthResponse>) => {
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+          state.loading = false;
+          state.role = action.payload.user?.role||"user";
+        }
+      )
       .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
@@ -114,11 +138,15 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.loading = false;
-      })
+      .addCase(
+        registerUser.fulfilled,
+        (state, action: PayloadAction<AuthResponse>) => {
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+          state.loading = false;
+          state.role = action.payload.user.role;
+        }
+      )
       .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
@@ -128,25 +156,36 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.loading = false;
-      })
-      .addCase(updateUserProfile.rejected, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(
+        updateUserProfile.fulfilled,
+        (state, action: PayloadAction<AuthResponse>) => {
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+          state.role = action.payload.user.role;
+          
+          state.loading = false;
+        }
+      )
+      .addCase(
+        updateUserProfile.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loading = false;
+          state.error = action.payload;
+        }
+      )
       // Handle get user profile
       .addCase(getUserProfile.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUserProfile.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
-        state.user = action.payload.user;
-        // Optionally, you might not update the token if it's not part of the profile response
-        state.loading = false;
-      })
+      .addCase(
+        getUserProfile.fulfilled,
+        (state, action: PayloadAction<AuthResponse>) => {
+          state.user = action.payload.user;
+          // Optionally, you might not update the token if it's not part of the profile response
+          state.loading = false;
+        }
+      )
       .addCase(getUserProfile.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
@@ -160,15 +199,16 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.loading = false;
-        localStorage.removeItem('token')
+        state.role = "none";
+
+        localStorage.removeItem("token");
       })
       .addCase(deleteAccount.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      ;
+      });
   },
 });
 
-export const { logout,setRole } = authSlice.actions;
+export const { logout, setRole } = authSlice.actions;
 export default authSlice.reducer;

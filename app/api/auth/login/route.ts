@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
 
-    return NextResponse.json({ token });
+    return NextResponse.json({ token, user });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return NextResponse.json({ message: "Something went wrong" }, { status: 500 });

@@ -1,24 +1,26 @@
 import { Quiz, QuizAttempt } from "@/types";
-import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "./ui/table";
 type Props = {
-  result: QuizAttempt;
+  attempt: QuizAttempt;
   quiz: Quiz;
-  ref:React.Ref<HTMLDivElement>
+  ref: React.Ref<HTMLDivElement>;
 };
 
-export default function ResultComponent({ quiz, result,ref }: Props) {
+export default function ResultComponent({ quiz, attempt, ref }: Props) {
   return (
-        <div className="w-[1024px] px-2 absolute top-0 sm:max-w-5xl m-auto py-5 flex flex-col gap-4 isolate z-0">
-      <div ref={ref} className="w-full px-5 max-w-full mx-auto">
+    <div
+      ref={ref}
+      className="w-full px-2 sm:max-w-5xl m-auto py-5 flex items-center flex-col gap-4 isolate z-0 relative"
+    >
+      <div className="w-full mx-auto">
         <Card className="p-2 sm:p-6 shadow-md">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">{quiz.title}</CardTitle>
@@ -31,30 +33,36 @@ export default function ResultComponent({ quiz, result,ref }: Props) {
               Duration: {quiz.duration} mins
             </p>
             <p className="mt-4 text-lg font-semibold">
-              Score: {result.score} / {result.totalQuestions}
+              Score: {attempt.score} / {attempt.totalQuestions}
             </p>
             <p className="text-gray-500">
-              Completion Time: {result.completionTime}
+              Completion Time: {attempt.completionTime}
             </p>
             <p className="text-sm text-gray-400">
-              Attempted on: {new Date(result.createdAt).toLocaleString()}
+              Attempted on: {new Date(attempt.createdAt).toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
         <div className="mt-6">
-          <Table>
-            <TableHeader>
+          <Table className="table-fixed">
+            <TableHeader className="h-14 sm:h-fit">
               <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>Question</TableHead>
-                <TableHead>Your Answer</TableHead>
-                <TableHead>Correct Answer</TableHead>
-                <TableHead>Time Taken</TableHead>
+                <TableHead className="w-6 sm:w-12 whitespace-nowrap">#</TableHead>
+                <TableHead className="w-[50%]">Question</TableHead>
+                <TableHead className="w-12 sm:w-24 sm:whitespace-nowrap">
+                  Your Answer
+                </TableHead>
+                <TableHead className="w-12 sm:w-24 sm:whitespace-nowrap flex-shrink-0">
+                  Correct Answer
+                </TableHead>
+                <TableHead className="w-12 sm:w-24 sm:whitespace-nowrap flex-shrink-0">
+                  Time Taken
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {result.details.map((answer, index) => {
+              {attempt.details.map((answer, index) => {
                 const question = quiz.questions.find(
                   (q) => q._id === answer.questionId
                 );
@@ -64,23 +72,31 @@ export default function ResultComponent({ quiz, result,ref }: Props) {
                     key={answer.questionId}
                     className={isCorrect ? "bg-green-100" : "bg-red-100"}
                   >
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{question ? question.text : "N/A"}</TableCell>
-                    <TableCell
-                      className={isCorrect ? "text-green-600" : "text-red-600"}
-                    >
-                      {answer.userAnswer}
+                    <TableCell className="w-8">{index + 1}</TableCell>
+                    <TableCell className="w-1/3">
+                      {question ? question.text : "N/A"}
                     </TableCell>
-                    <TableCell>{answer.correctAnswer}</TableCell>
-                    <TableCell>{answer.timeTaken}</TableCell>
+                    <TableCell className="w-1/3">
+                      <span
+                        className={
+                          isCorrect ? "text-green-600" : "text-red-600"
+                        }
+                      >
+                        {answer.userAnswer}
+                      </span>
+                    </TableCell>
+                    <TableCell className="w-1/6 flex-shrink-0">
+                      {answer.correctAnswer}
+                    </TableCell>
+                    <TableCell className="w-1/6 flex-shrink-0">
+                      {answer.timeTaken}
+                    </TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
         </div>
-
-        
       </div>
     </div>
   );

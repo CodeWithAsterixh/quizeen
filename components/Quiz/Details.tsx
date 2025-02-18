@@ -16,19 +16,19 @@ export default function Details({startQuiz}:{
     </CardHeader>
     <CardContent>
       <p className="text-sm text-gray-600">
-        Duration: {currentQuiz?.duration} minutes
+        Duration: {`${currentQuiz?.duration}`} minutes
       </p>
       <p className="text-sm text-gray-600">
-        Created by: {currentQuiz?.createdBy}
+        Created by: {`${currentQuiz?.createdBy}`}
       </p>
       {currentQuiz?.createdAt && (
         <p className="text-sm text-gray-500">
-          Created at: {new Date(currentQuiz.createdAt).toLocaleString()}
+          Created at: {`${new Date(currentQuiz.createdAt).toLocaleString()}`}
         </p>
       )}
       {currentQuiz?.updatedAt && (
         <p className="text-sm text-gray-500">
-          Updated at: {new Date(currentQuiz.updatedAt).toLocaleString()}
+          Updated at: {`${new Date(currentQuiz.updatedAt).toLocaleString()}`}
         </p>
       )}
       <Button variant={"success"} className="mt-3" onClick={startQuiz}>Start quiz</Button>
