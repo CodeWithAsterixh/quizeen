@@ -7,13 +7,12 @@ import QuestionComponent from "@/components/Quiz/Question";
 import ResultComponent from "@/components/ResultComponent";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { fetchQuizById } from "@/lib/features/quizSlice";
+import { useSettingsUpdate } from "@/hooks/useSettingsUpdate";
 import { setUnknownState } from "@/lib/features/unknownSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { QuizAttempt, selectedOptions } from "@/types";
 import { DownloadIcon, Save } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { usePDF } from "react-to-pdf";
 
@@ -22,10 +21,9 @@ export default function Page() {
   const { role } = useAppSelector((s) => s.auth);
   const { saveResults } = useAppSelector((s) => s.settings);
   const isMobile = useIsMobile();
-  // const { user } = useAppSelector((s) => s.auth);
+  const { handleToggleSaveResults } = useSettingsUpdate().actions;
 
   const { targetRef, toPDF } = usePDF();
-  const { id } = useParams<{ id: string }>();
   const [quizTiming, setQuizTiming] = useState({
     started: false,
     timeLeft: 0,
@@ -39,12 +37,13 @@ export default function Page() {
     status: "not loaded",
     answers: {},
   });
+  const [resave, setResave] = useState(false);
   const dispatch = useAppDispatch();
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchQuizById(id));
-    }
-  }, [dispatch, id]);
+
+  function resaveResult() {
+    handleToggleSaveResults();
+    setResave(true);
+  }
 
   useEffect(() => {
     if (currentQuiz) {
@@ -55,14 +54,12 @@ export default function Page() {
     }
   }, [currentQuiz]);
 
-
   const handleEnd = useCallback(
     (end: boolean, answers: Record<number, selectedOptions>) => {
       setQuizTiming((qt) => ({
         ...qt,
         ended: end,
       }));
-
 
       dispatch(
         setUnknownState({
@@ -74,10 +71,10 @@ export default function Page() {
         })
       );
 
-      setResultProcess(re=>({
+      setResultProcess((re) => ({
         ...re,
-        answers
-      }))
+        answers,
+      }));
     },
     [currentQuiz?._id, dispatch]
   );
@@ -142,6 +139,7 @@ export default function Page() {
               <Button
                 variant="secondary"
                 className="flex items-center justify-center gap-2"
+                onClick={resaveResult}
               >
                 <Save />
                 Save result
@@ -168,17 +166,25 @@ export default function Page() {
         </>
       )}
 
-      {quizTiming.started &&
-        !quizTiming.ended &&
-        resultProcess.status === "not loaded" && (
-          <>
-            <MinuteCountdown setEnd={handleEnd} minutes={quizTiming.timeLeft} />
-            <QuestionComponent
-              setEnd={handleEnd}
-              setResultProcess={setResultProcess}
-            />
-          </>
-        )}
+      <MinuteCountdown
+        show={
+          quizTiming.started &&
+          !quizTiming.ended &&
+          resultProcess.status === "not loaded"
+        }
+        setEnd={handleEnd}
+        minutes={quizTiming.timeLeft}
+      />
+      <QuestionComponent
+        setEnd={handleEnd}
+        setResultProcess={setResultProcess}
+        reSave={resave}
+        show={
+          quizTiming.started &&
+          !quizTiming.ended &&
+          resultProcess.status === "not loaded"
+        }
+      />
     </div>
   );
 }

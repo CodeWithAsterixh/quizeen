@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   await connectToDatabase()
   
   try {
-    const { quizId, userId, answers, role } = await req.json() as QuestionResultSubmission;
+    const { quizId, userId, answers, role, saveResult } = await req.json() as QuestionResultSubmission;
           
       // Access the quizId from params
     const quiz = await Quiz.findById(quizId);
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
 
 
     
-    if(role==="guest"){
+    if(role==="guest" || !saveResult){
     return NextResponse.json(resultWithoutUser);
 
     }

@@ -6,6 +6,7 @@ import { DialogClose } from './ui/dialog'
 import UseModal from './Modal'
 import { useAppDispatch } from '@/lib/hooks'
 import { logout } from '@/lib/features/authSlice'
+import { clearQuizState } from '@/lib/features/quizSlice'
 
 type Props = {
     trigger:React.ReactNode
@@ -15,6 +16,7 @@ export default function LogOutModal({trigger}: Props) {
     const dispatch = useAppDispatch()
    const handleLogout = () => {
       dispatch(logout());
+      dispatch(clearQuizState());
     };
   return (
     <UseModal

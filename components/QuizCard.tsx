@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/lib/hooks";
+import { PencilLine, Trash2Icon } from "lucide-react";
+import DeleteItemModal from "./DeleteItemModal";
 
 interface QuizCardProps {
   quiz: {
@@ -18,6 +20,7 @@ interface QuizCardProps {
 const QuizCard: React.FC<QuizCardProps> = ({ quiz }) => {
   const [isDone, setIsDone] = useState(false)
   const userCompleted = useAppSelector(s=>s.quiz.userCompleted)
+  const {role} = useAppSelector(s=>s.auth)
 
   useEffect(() => {
     if(userCompleted.length>0&&userCompleted.find(q=>q.quizId===quiz._id)){
@@ -49,6 +52,18 @@ const QuizCard: React.FC<QuizCardProps> = ({ quiz }) => {
           </Button>
         </Link>
         }
+        {role==="admin"&&<>
+          <Link href={`/quizzes/${quiz._id}/edit`}>
+        <Button variant={"ghost"} className="!px-2.5 rounded-full">
+          <PencilLine/>
+          </Button>
+        </Link>
+        <DeleteItemModal itemName={quiz.title} trigger={
+          <Button variant={"destructive"} className="!px-2.5 rounded-full">
+          <Trash2Icon/>
+          </Button>
+        } id={quiz._id} />
+        </>}
       </CardFooter>
     </Card>
   );

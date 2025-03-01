@@ -101,7 +101,8 @@ export interface QuestionResultSubmission {
   quizId: string;
   userId?: string;
   answers: Record<number, selectedOptions>;
-  role:userRoles
+  role:userRoles,
+  saveResult: boolean
 }
 
 export interface QuestionResult {

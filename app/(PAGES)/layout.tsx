@@ -2,9 +2,10 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { getUserProfile, setRole } from "@/lib/features/authSlice";
+import { getUserProfile, setRole, setToken } from "@/lib/features/authSlice";
 import { getResults } from "@/lib/features/quizSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import Cookies from 'js-cookie';
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,18 +14,20 @@ import { useEffect, useState } from "react";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const dispatch = useAppDispatch();
-  const { user, loading, error,role } = useAppSelector((state) => state.auth);
+  const { user, loading, error,role,token } = useAppSelector((state) => state.auth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Ensures proper loading before rendering
-
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-
-    if (storedToken) {
+    const storedToken = Cookies.get("token") || null;
+    
+    dispatch(setToken(storedToken))
+  }, [dispatch]);
+  useEffect(() => {
+    if (token) {
       dispatch(getUserProfile()).finally(() => setIsCheckingAuth(false));
     } else {
       setIsCheckingAuth(false);
     }
-  }, [dispatch]);
+  }, [dispatch,token]);
 
   useEffect(() => {
     if (user) {
@@ -70,7 +73,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     role=="none"&& (!loading &&
     !user &&
     !path.includes("auth") &&
-    !localStorage.getItem("token"))||
+    !token)||
     error
   ) {
     return(

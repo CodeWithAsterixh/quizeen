@@ -1,6 +1,4 @@
-"use client"
-
-import AddQuizForm from "@/components/NewQuizForm";
+import QuizForm from "@/components/QuizForm";
 
 
 const NewQuizPage = () => {
@@ -8,7 +6,7 @@ const NewQuizPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-2 sm:px-4">
-     <AddQuizForm/>
+     <QuizForm/>
     </div>
   );
 };
