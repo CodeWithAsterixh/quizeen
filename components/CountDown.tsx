@@ -8,9 +8,10 @@ import { selectedOptions } from "@/types";
 interface MinuteCountdownProps {
   minutes: number;
   setEnd:(end:boolean, answers:Record<number, selectedOptions>)=>void
+  show:boolean
 }
 
-export function MinuteCountdown({ minutes,setEnd }: MinuteCountdownProps) {
+export function MinuteCountdown({ minutes,setEnd,show }: MinuteCountdownProps) {
   // Convert minutes to seconds for internal state.
   const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
 
@@ -37,6 +38,8 @@ export function MinuteCountdown({ minutes,setEnd }: MinuteCountdownProps) {
     const s = totalSeconds % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
+
+  if(!show)return null
 
   return (
     <div className="flex items-center gap-3 p-4 bg-white dark:bg-neutral-800 rounded-md shadow">

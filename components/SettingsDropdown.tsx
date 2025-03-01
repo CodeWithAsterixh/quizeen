@@ -2,31 +2,19 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { setTheme, toggleSaveResults } from "@/lib/features/settingsSlice";
-import { useAppDispatch } from "@/lib/hooks";
-import { RootState } from "@/lib/store";
+import { useSettingsUpdate } from "@/hooks/useSettingsUpdate";
 import { CheckIcon, MoonIcon, SunIcon } from "lucide-react";
 import React from "react";
-import { useSelector } from "react-redux";
 
 const SettingsDropdown: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { theme, saveResults } = useSelector((state: RootState) => state.settings);
-
-  const handleThemeToggle = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    dispatch(setTheme(newTheme));
-  };
-
-  const handleToggleSaveResults = () => {
-    dispatch(toggleSaveResults());
-  };
+  const {handleThemeToggle,handleToggleSaveResults} = useSettingsUpdate().actions
+  const {settings} = useSettingsUpdate()
 
   return (
     <DropdownMenu>
@@ -37,7 +25,7 @@ const SettingsDropdown: React.FC = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuItem onClick={handleThemeToggle}>
-          {theme === "light" ? (
+          {settings.theme === "light" ? (
             <>
               <MoonIcon className="mr-2 h-4 w-4" />
               Switch to Dark Mode
@@ -51,7 +39,7 @@ const SettingsDropdown: React.FC = () => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleToggleSaveResults}>
-          {saveResults ? (
+          {settings.saveResults ? (
             <>
               <CheckIcon className="mr-2 h-4 w-4" />
               Disable Save Results

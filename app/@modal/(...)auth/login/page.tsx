@@ -8,57 +8,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { submitQuiz } from "@/lib/features/quizSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { AuthResponse } from "@/types";
-import { Save } from "lucide-react";
+import { useAuthSuccess } from "@/hooks/useAuthSuccess";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
 
 type Props = object;
 
 export default function Page({}: Props) {
   const { back } = useRouter();
-  const {state,from} = useAppSelector(s=>s.anySlice)
-  const {toast} = useToast()
-  const dispatch = useAppDispatch()
-  const successAction = useCallback(async (res: AuthResponse)=>{
-    if(res.user && state){
-      switch (from) {
-        case "quiz-submit":
-          try {
-            await dispatch(submitQuiz({
-              answers:state.answers,
-              quizId:state.quizId,
-              userId:res.user._id,
-              role:res.user.role,
-            }))
-            toast({
-              title: "Quiz saved successfully",
-              icon:<Save/>,
-              variant:"success"
-            })
-            
-  
-  
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (error) {
-            toast({
-              title: "Something went wrong",
-              variant:"destructive"
-            })
-          }
-          break;
-      
-        default:
-          break;
-      }
-    }
-    back()
 
-  },[back, dispatch, from, state, toast])
+  // Hook to handle successful authentication
+  const successAction = useAuthSuccess();
   return (
     <Dialog onClose={back} open>
       <DialogContent className="max-h-[90vh] overflow-y-auto rounded-md scrollbar !px-0 w-fit max-w-[98vw] sm:max-w-[90vw]">

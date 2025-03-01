@@ -1,28 +1,44 @@
+"use client"
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreateQuiz } from "@/lib/features/quizSlice";
+import { useToast } from "@/hooks/use-toast";
+import { CreateQuiz, fetchQuizById, UpdateQuiz } from "@/lib/features/quizSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import { Question } from "@/types";
 import { PencilLine, Plus, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UseModal from "./Modal";
 import QuestionModal from "./QuestionModal";
 import { DialogClose } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
-export default function AddQuizForm() {
+export interface QuizFormState {
+  title: string,
+    description: string,
+    duration: number,
+    questions: Question[],
+    _id?:string
+}
+
+type props = {
+  dataFiller?:QuizFormState,
+  type?:"ADD"|"EDIT"
+}
+export default function QuizForm({dataFiller, type="ADD"}:props) {
   const {toast} = useToast()
+  const {push} = useRouter()
 
-  const [quiz, setQuiz] = useState({
+  const [quiz, setQuiz] = useState<QuizFormState>(dataFiller||{
     title: "",
     description: "",
-    duration: "",
-    questions: [] as Question[],
+    duration: 0,
+    questions: [],
   });
+  const [noChanges, setNoChanges] = useState(true)
 
   const dispatch = useAppDispatch()
   const handleAddQuestion = (question: Question) => {
@@ -53,6 +69,13 @@ export default function AddQuizForm() {
     setQuiz((prev) => ({ ...prev, [field]: value }));
   };
 
+  useEffect(()=>{
+    if(JSON.stringify(quiz) === JSON.stringify(dataFiller) ){
+      setNoChanges(true)
+    }else{
+      setNoChanges(false)
+    }
+  }, [dataFiller, quiz])
   const handleSubmit = async ()=>{
     const {description,duration,questions,title} = quiz
     if(title.trim()===""){
@@ -63,7 +86,7 @@ export default function AddQuizForm() {
       })
       return
     }
-    if(duration.trim()===""){
+    if(parseInt(`${duration}`)===0){
       toast({
         variant:"warning",
         description:"Test duration is required"
@@ -85,28 +108,52 @@ export default function AddQuizForm() {
       return
     }
     
-    const createdBy = "Admin Asterixh"
+    
+
+
+    
+
+    if(type==="ADD"){
+      const createdBy = "Admin Asterixh"
     const createdAt = new Date().toISOString()
     const updatedAt = new Date().toISOString()
-
-    dispatch(CreateQuiz({
-      ...quiz,
-      duration: parseInt(quiz.duration),
-      createdBy,
-      createdAt,
-      updatedAt,
-      _id:""
-    })).then(()=>{
-      toast({
-        variant:"success",
-        description:"Test added"
+      dispatch(CreateQuiz({
+        ...quiz,
+        duration: parseInt(`${quiz.duration}`),
+        createdBy,
+        createdAt,
+        updatedAt,
+        _id:""
+      })).then(()=>{
+        toast({
+          variant:"success",
+          description:"Test added"
+        })
+      }).catch(()=>{
+        toast({
+          variant:"destructive",
+          description:"Something went wrong"
+        })
       })
-    }).catch(()=>{
-      toast({
-        variant:"destructive",
-        description:"Something went wrong"
+    }else if(type==="EDIT"){
+      dispatch(UpdateQuiz({
+        ...quiz,
+        duration: parseInt(`${quiz.duration}`),
+      })).then(()=>{
+        toast({
+          variant:"success",
+          description:"Test Updated successfully"
+        })
+        push(`/quizzes/${quiz._id}`)
+      }).catch(()=>{
+        toast({
+          variant:"destructive",
+          description:"Something went wrong"
+        })
       })
-    })
+      dispatch(fetchQuizById(`${quiz._id}`));
+      
+    }
 
 
   }
@@ -202,7 +249,7 @@ export default function AddQuizForm() {
           actions={{ handleQuestionSave: handleAddQuestion, type:"add" }}
           index={quiz.questions.length}
         />
-        <Button className="w-full" onClick={handleSubmit}>Submit Quiz</Button>
+        <Button disabled={noChanges} className="w-full" onClick={handleSubmit}>{type==="ADD"?"Submit Quiz":"Save changes"}</Button>
       </CardContent>
     </Card>
   );

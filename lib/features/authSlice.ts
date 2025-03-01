@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import Cookies from 'js-cookie'
 import {
-  AuthState,
   AuthResponse,
+  AuthState,
   LoginPayload,
   RegisterPayload,
   userRoles,
 } from "@/types";
 import api from "@/utils/api";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Initial state for authentication
 const initialState: AuthState = {
@@ -74,7 +75,6 @@ export const loginUser = createAsyncThunk<AuthResponse, LoginPayload>(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await api.post<AuthResponse>("/auth/login", credentials);
-      localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
@@ -88,7 +88,7 @@ export const registerUser = createAsyncThunk<AuthResponse, RegisterPayload>(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.post<AuthResponse>("/auth/register", userData);
-      localStorage.setItem("token", response.data.token);
+      
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -107,10 +107,14 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.role = "none";
-      localStorage.removeItem("token");
+      
+      Cookies.remove("token")
     },
     setRole: (state, action: { payload: userRoles }) => {
       state.role = action.payload;
+    },
+    setToken: (state, action: { payload: string|null }) => {
+      state.token = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -200,8 +204,7 @@ const authSlice = createSlice({
         state.token = null;
         state.loading = false;
         state.role = "none";
-
-        localStorage.removeItem("token");
+        Cookies.remove("token")
       })
       .addCase(deleteAccount.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
@@ -210,5 +213,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setRole } = authSlice.actions;
+export const { logout, setRole,setToken } = authSlice.actions;
 export default authSlice.reducer;
