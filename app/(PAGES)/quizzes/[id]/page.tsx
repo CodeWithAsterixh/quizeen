@@ -11,6 +11,7 @@ import { useSettingsUpdate } from "@/hooks/useSettingsUpdate";
 import { setUnknownState } from "@/lib/features/unknownSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { QuizAttempt, selectedOptions } from "@/types";
+import { authInterceptorNext } from "@/utils/authInterceptorNext";
 import { DownloadIcon, Save } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
@@ -109,6 +110,8 @@ export default function Page() {
       </div>
     );
   }
+  const next = JSON.stringify(authInterceptorNext({url:`/quizzes/${currentQuiz._id}`, action:'quiz-submit'}))
+  
 
   return (
     <div className="w-full max-w-3xl m-auto py-5 px-2 sm:px-4 flex flex-col gap-4">
@@ -127,7 +130,7 @@ export default function Page() {
           />
           <div className="w-full flex gap-2 px-2 items-center justify-end">
             {role === "guest" ? (
-              <Link href={`/auth/login`}>
+              <Link href={`/auth/login?_next=${next}`}>
                 <Button
                   variant="secondary"
                   className="flex items-center justify-center gap-2"

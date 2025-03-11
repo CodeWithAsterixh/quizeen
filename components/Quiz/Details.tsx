@@ -12,10 +12,21 @@ import Link from "next/link";
 import DeleteItemModal from "../DeleteItemModal";
 import { PencilLine, Trash2Icon } from "lucide-react";
 import Loader from "../loader";
+import { useEffect, useState } from "react";
 
 export default function Details({ startQuiz }: { startQuiz: () => void }) {
   const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
   const { role } = useAppSelector((s) => s.auth);
+  const [isDone, setIsDone] = useState(false)
+  const userCompleted = useAppSelector(s=>s.quiz.userCompleted)
+  
+    useEffect(() => {
+      if(userCompleted.length>0&&userCompleted.find(q=>q.quizId===currentQuiz?._id)){
+        setIsDone(true)
+      }else{
+        setIsDone(false)
+      }
+    }, [currentQuiz, userCompleted])
   if (!currentQuiz) return <Loader />;
 
   return (
@@ -42,9 +53,18 @@ export default function Details({ startQuiz }: { startQuiz: () => void }) {
           </p>
         )}
         <div className="w-full flex items-center justify-between gap-2 mt-3">
+          <div className="flex items-center justify-center gap-2">
           <Button variant={"success"} onClick={startQuiz}>
-            Start quiz
+            {isDone?"Take Quiz again":"Start quiz"}
           </Button>
+          {
+          isDone&&<Link href={`/results/${userCompleted.find(q=>q.quizId===currentQuiz._id)?._id}`}>
+          <Button variant="info">
+            See results
+          </Button>
+        </Link>
+        }
+          </div>
           
           {role === "admin" && (
             <div className="flex items-center gap-2">

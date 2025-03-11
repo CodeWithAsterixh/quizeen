@@ -59,35 +59,38 @@ export default function QuizResultsTable({ results }: QuizResultsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {results.map((result, ind) => (
-            <TableRow
-              key={result._id}
-              onClick={()=>handleRoute(result._id)}
-              className="hover:bg-gray-50 cursor-pointer"
-            >
-              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                {quiz.length > 0 && quiz[ind]?.title ? (
-                  quiz[ind].title
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <LoaderIcon className="animate-spin"></LoaderIcon>
-                  </div>
-                )}
-              </TableCell>
-              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                {result.score}
-              </TableCell>
-              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                {result.totalQuestions}
-              </TableCell>
-              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                {result.completionTime}
-              </TableCell>
-              <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                {new Date(result.createdAt).toLocaleString()}
-              </TableCell>
-            </TableRow>
-          ))}
+          {results.map((result) => {
+            const quizName = quiz.find(res => res._id === result.quizId)?.title
+            return (
+              <TableRow
+                key={result._id}
+                onClick={()=>handleRoute(result._id)}
+                className="hover:bg-gray-50 cursor-pointer"
+              >
+                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                  {quiz.length > 0 &&  quizName? (
+                    quizName
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <LoaderIcon className="animate-spin"></LoaderIcon>
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                  {result.score}
+                </TableCell>
+                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                  {result.totalQuestions}
+                </TableCell>
+                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                  {result.completionTime}
+                </TableCell>
+                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+                  {new Date(result.createdAt).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            )
+          })}
 
           {results.length === 0 && (
             <tr>

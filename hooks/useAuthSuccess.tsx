@@ -1,20 +1,20 @@
-import { useCallback } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { submitQuiz } from "@/lib/features/quizSlice";
-import { AuthResponse } from "@/types";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { submitQuiz } from "@/lib/features/quizSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { AuthResponse } from "@/types";
+import { authInterceptor } from "@/utils/authInterceptorNext";
 import { Save } from "lucide-react";
-
-export const useAuthSuccess = () => {
-  const { back } = useRouter();
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+export const useAuthSuccess = (params?:authInterceptor| null) => {
+  const { back,push } = useRouter();
   const dispatch = useAppDispatch();
   const { state, from } = useAppSelector((s) => s.anySlice);
-  const { saveResults } = useAppSelector((s) => s.settings);
   const { toast } = useToast();
 
   return useCallback(
     async (res: AuthResponse) => {
+      console.log(state)
       if (res.user && state) {
         switch (from) {
           case "quiz-submit":
@@ -25,9 +25,10 @@ export const useAuthSuccess = () => {
                   quizId: state.quizId,
                   userId: res.user._id,
                   role: res.user.role,
-                  saveResult: saveResults,
+                  saveResult: true,
                 })
               );
+              
               toast({
                 title: "Quiz saved successfully",
                 icon: <Save />,
@@ -46,8 +47,13 @@ export const useAuthSuccess = () => {
             break;
         }
       }
-      back();
+      if(params?.url){
+        push(params?.url)
+      }else{
+        back();
+      }
+      
     },
-    [back, dispatch, from, saveResults, state, toast]
+    [back, dispatch, from, params, push, state, toast]
   );
 };

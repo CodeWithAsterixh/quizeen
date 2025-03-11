@@ -53,8 +53,12 @@ export interface Question {
 }
 
 // quiz-attempt.interface.ts
+interface answer {
+  answer:selectedOptions,
+  timeTaken:number
+}
 export interface QuizAttempt {
-  _id: string;
+  _id: string | ObjectId;
   userId: string;
   quizId: string;
   score: number;
