@@ -1,3 +1,4 @@
+"use client"
 import AuthForm from '@/components/AuthForm'
 import { useAuthSuccess } from '@/hooks/useAuthSuccess'
 import { AuthResponse } from '@/types'
