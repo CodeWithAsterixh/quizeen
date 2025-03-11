@@ -18,7 +18,6 @@ export default function Page({}: Props) {
     successAction(res)
   }
 
-console.log(_next_obj?.url)
   return (
     <div className="flex h-screen flex-col gap-9 items-center justify-center bg-gradient-to-br from-neutral-100 to-slate-300">
       <AuthForm type="login" intercept={_next_obj?.url?true:undefined} onSuccess={handleSuccessAction} />
