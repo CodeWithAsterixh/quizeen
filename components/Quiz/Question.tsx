@@ -5,7 +5,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import { useQuestionNavigation } from "@/hooks/useQuestionNavigation";
 import { useSubmitQuiz } from "@/hooks/useSubmitQuiz";
 import { useAppSelector } from "@/lib/hooks";
-import { QuizAttempt, selectedOptions } from "@/types";
+import { selectedOptions, QuizAttempt } from "@/types";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import React, { useEffect } from "react";

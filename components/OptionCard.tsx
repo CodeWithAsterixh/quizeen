@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,8 @@ interface OptionCardProps {
 }
 
 const OptionCard: React.FC<OptionCardProps> = ({ optionKey, optionValue, isSelected, onSelect }) => {
+
+  
   return (
     <div
       className={clsx(

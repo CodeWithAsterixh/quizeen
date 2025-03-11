@@ -68,7 +68,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err || "An error occurred. Please try again.");
-      console.log(err)
     }finally{
       setLoading(false)
     }
@@ -91,12 +90,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
         intercept?"shadow-none":"shadow-lg"
       )
     }>
-      
-      {
-        !intercept&&<h2 className="text-2xl font-semibold mb-4">
+      <h2 className="text-2xl font-semibold mb-4">
         {type === "login" ? "Login" : "Register"}
       </h2>
-      }
       {error && <p className="text-red-500 mb-4">{`${error}`}</p>}
       <form onSubmit={handleSubmit}>
         {type === "register" && (

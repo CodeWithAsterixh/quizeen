@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { QuizAttempt, selectedOptions } from "@/types";
+import { authInterceptorNext } from "@/utils/authInterceptorNext";
 
 interface SubmitQuizParams {
   currentQuizId: string;
@@ -66,11 +67,12 @@ export const useSubmitQuiz = ({
       });
     } else {
       if (role === "guest") {
+        const next = JSON.stringify(authInterceptorNext({url:`/quizzes/${currentQuizId}`, action:'quiz-submit'}))
         toast({
           variant: "success",
           description: "Here is your result",
           action: (
-            <Button onClick={() => push("/auth/login")}>
+            <Button onClick={() => push(`/auth/login?_next=${next}`)}>
               Save now
             </Button>
           ),

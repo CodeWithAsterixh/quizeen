@@ -24,6 +24,10 @@ const QuizzesPage = () => {
   const [searchFilter, setSearchFilter] = useState<Quiz[]>(filteredQuiz);
 
   useEffect(() => {
+    dispatch(fetchQuizzes()); 
+  }, [dispatch])
+  
+  useEffect(() => {
     setSearchFilterInput("")
 
     return()=>{
@@ -32,9 +36,6 @@ const QuizzesPage = () => {
   }, [])
   
 
-  useEffect(() => {
-    dispatch(fetchQuizzes());
-  }, [dispatch]);
   const handleSearch = () => {
     setSearchFilter(
       filteredQuiz
@@ -50,7 +51,7 @@ const QuizzesPage = () => {
         <h1 className="text-4xl px-4 font-bold text-center text-gray-800 mb-8">
           Available Quizzes
         </h1>
-        <div className="w-full bg-gray-100 p-2 mx-auto mb-4 flex justify-center items-center gap-2 sticky top-11 sm:top-14">
+        <div className="w-full bg-gray-100 p-2 mx-auto mb-4 flex justify-center items-center gap-2 sticky top-11 sm:top-12 sm:pt-4">
           <Input
             onChange={(e) => setSearchFilterInput(e.target.value)}
             className="border-neutral-400 border-[1px] max-w-md"

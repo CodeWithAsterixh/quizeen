@@ -2,7 +2,9 @@ import { connectToDatabase } from "@/lib/mongo";
 import { Quiz } from "@/models/Quiz";
 import { QuizResult } from "@/models/QuizResult";
 import { details, QuestionResultSubmission, QuizAttempt } from "@/types";
+import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+
 
 // POST /api/quizzes/submit
 export async function POST(req: Request) {
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
       totalQuestions: quiz.questions.length,
       details,
       completionTime: "15:00", // Example time; can be captured in the frontend
-      _id:quizId,
+      _id:new mongoose.Types.ObjectId(),
       correctAnswers:details.filter(d=>d.isCorrect).length,
       createdAt: (new Date()).toISOString()
     }

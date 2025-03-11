@@ -38,7 +38,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   function handleGuest(){
     dispatch(setRole("guest"))
-    console.log(role)
   }
   
 

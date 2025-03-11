@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
 import { selectedOptions } from "@/types";
+import { useCallback, useState } from "react";
 
 interface QuizNavigationState {
   current: number;
@@ -12,6 +12,7 @@ export const useQuestionNavigation = (totalQuestions: number) => {
     status: "not-finished",
   });
   const [answers, setAnswers] = useState<Record<number, selectedOptions>>({});
+ 
 
   const handleNext = useCallback(() => {
     setQuizState((st) => {
@@ -34,6 +35,7 @@ export const useQuestionNavigation = (totalQuestions: number) => {
       ...prev,
       [questionIndex + 1]: option,
     }));
+
   }, []);
 
   return {
