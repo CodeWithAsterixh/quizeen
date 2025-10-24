@@ -1,34 +1,64 @@
 import { connectToDatabase } from "@/lib/mongo";
+import { signAccessToken, setTokenCookie } from "@/lib/auth/jwt";
 import { User } from "@/models/User";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 // POST /api/auth/login
 export async function POST(req: Request) {
-
   try {
-    await connectToDatabase()
-    const { email, password } = await req.json();
+    await connectToDatabase();
+    
+    // Parse request body
+    const body = await req.json();
+    const email = body?.email?.toLowerCase();
+    const password = body?.password;
+
+    // Input validation
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password are required" },
+        { status: 400 }
+      );
+    }
+
     const user = await User.findOne({ email });
 
+    // Use consistent error message for security
+    const invalidCredentials = { 
+      error: "Invalid email or password" 
+    };
+
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(invalidCredentials, { status: 401 });
     }
 
     const passwordIsValid = await bcrypt.compare(password, user.passwordHash);
     if (!passwordIsValid) {
-      return NextResponse.json({ message: "Incorrect password" }, { status: 400 });
+      return NextResponse.json(invalidCredentials, { status: 401 });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
+    // Generate JWT token with user ID and role
+    const token = signAccessToken({
+      userId: user._id.toString(),
+      role: user.role,
+    });
 
-    (await cookies()).set("token",token)
-    return NextResponse.json({ token, user });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // Create response
+    const response = NextResponse.json({ 
+      user: user.toJSON(),
+      success: true 
+    });
+
+    // Set secure HTTP-only cookie
+    await setTokenCookie(token);
+
+    return response;
   } catch (error) {
-    return NextResponse.json({ message: "Something went wrong" }, { status: 500 });
+    console.error("Login error:", error);
+    return NextResponse.json(
+      { error: "Authentication failed" },
+      { status: 500 }
+    );
   }
 }

@@ -53,8 +53,7 @@ const UserSchema: Schema<IUser> = new Schema(
         ret.createdAt = ret.createdAt.toISOString();
         ret.updatedAt = ret.updatedAt.toISOString();
         delete ret.__v;
-        // Optionally, remove passwordHash from output for security:
-        // delete ret.passwordHash;
+        delete ret.passwordHash; // Always remove password hash from JSON
         return ret;
       },
     },

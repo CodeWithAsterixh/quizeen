@@ -1,0 +1,58 @@
+import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers';
+
+export interface TokenPayload {
+  userId: string;
+  role: 'user' | 'admin';
+  iat?: number;
+  exp?: number;
+}
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Validate JWT_SECRET at startup
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET must be provided');
+}
+
+export function signAccessToken(payload: TokenPayload): string {
+  return jwt.sign(
+    payload,
+    JWT_SECRET!, // Assert JWT_SECRET is defined since we checked above
+    { 
+      algorithm: 'HS256',
+      expiresIn: '8h'  // 8 hours
+    }
+  );
+}
+
+export function verifyToken(token: string): TokenPayload {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET!) as jwt.JwtPayload;
+    
+    // Validate the payload structure
+    if (!decoded.userId || !decoded.role || 
+        !['user', 'admin'].includes(decoded.role)) {
+      throw new Error('Invalid token payload');
+    }
+    
+    return {
+      userId: decoded.userId,
+      role: decoded.role as 'user' | 'admin',
+      iat: decoded.iat,
+      exp: decoded.exp
+    };
+  } catch (error) {
+    throw new Error('Invalid token');
+  }
+}
+
+export async function setTokenCookie(token: string): Promise<void> {
+  (await cookies()).set('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 8 * 60 * 60 // 8 hours
+  });
+}
