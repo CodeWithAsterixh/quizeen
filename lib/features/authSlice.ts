@@ -91,8 +91,9 @@ export const registerUser = createAsyncThunk<AuthResponse, RegisterPayload>(
       
       return response.data;
     } catch (error: any) {
+      console.log(error.response.data.error.message, "1")
       return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
+        error.response?.data?.message || error.response.data.error.message || "Registration failed"
       );
     }
   }

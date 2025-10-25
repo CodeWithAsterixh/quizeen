@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/middleware/withAuth";
 import { getUserFromRequest } from "@/middleware/withAuth";
 
-export async function POST(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
   // Verify authentication and get user info
   const authResponse = await withAuth(req);
   if (authResponse.status !== 200) {

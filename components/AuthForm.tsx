@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
+import api from "@/utils/api";
 
 interface AuthFormProps {
   type: "login" | "register"; // Distinguishes between login and registration modes
@@ -45,12 +46,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setLoading(true)
+    setLoading(true);
+
     // Validate password match for registration
     if (type === "register" && password !== confirmPassword) {
       setError("Passwords do not match.");
-      setLoading(false)
+      setLoading(false);
       return;
+    }
+
+    try {
+      // Pre-flight request to get CSRF token
+      await api.get('/auth/csrf');
+    } catch (error) {
+      console.error('Failed to get CSRF token:', error);
     }
 
     try {

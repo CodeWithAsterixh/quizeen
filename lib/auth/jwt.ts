@@ -15,7 +15,7 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET must be provided');
 }
 
-export function signAccessToken(payload: TokenPayload): string {
+export function signJWT(payload: TokenPayload): string {
   return jwt.sign(
     payload,
     JWT_SECRET!, // Assert JWT_SECRET is defined since we checked above
@@ -42,7 +42,7 @@ export function verifyToken(token: string): TokenPayload {
       iat: decoded.iat,
       exp: decoded.exp
     };
-  } catch (error) {
+  } catch {
     throw new Error('Invalid token');
   }
 }

@@ -18,8 +18,8 @@ export async function withAuth(
 
     let payload: TokenPayload;
     try {
-      payload = await verifyToken(token.value);
-    } catch (error) {
+      payload = verifyToken(token.value);
+    } catch {
       return NextResponse.json(
         { error: 'Unauthorized: Invalid token' },
         { status: 401 }
