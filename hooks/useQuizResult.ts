@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/hooks';
 import { setUnknownState } from '@/lib/features/unknownSlice';
 import { QuizAttempt, selectedOptions } from '@/types';
@@ -11,29 +11,36 @@ interface ResultProcessState {
 
 export const useQuizResult = () => {
   const dispatch = useAppDispatch();
-  const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
+  const currentQuizId = useAppSelector((s) => s.quiz.currentQuiz?._id);
   const [resultProcess, setResultProcess] = useState<ResultProcessState>({
     status: "not loaded",
     answers: {},
   });
 
+  // Prevent dispatch loop by memoizing last sent payload
+  const lastSentAnswersRef = useRef<string | null>(null);
+
   const handleEnd = useCallback(
-    (end: boolean, answers: Record<number, selectedOptions>) => {
-      dispatch(
-        setUnknownState({
-          state: {
-            quizId: currentQuiz?._id || "",
-            answers,
-          },
-          from: "quiz-submit",
-        })
-      );
+    (_end: boolean, answers: Record<number, selectedOptions>) => {
+      const payloadKey = JSON.stringify({ quizId: currentQuizId || "", answers });
+      if (lastSentAnswersRef.current !== payloadKey) {
+        lastSentAnswersRef.current = payloadKey;
+        dispatch(
+          setUnknownState({
+            state: {
+              quizId: currentQuizId || "",
+              answers,
+            },
+            from: "quiz-submit",
+          })
+        );
+      }
       setResultProcess((re) => ({
         ...re,
         answers,
       }));
     },
-    [currentQuiz?._id, dispatch]
+    [currentQuizId, dispatch]
   );
 
   const setResult = useCallback((result: QuizAttempt) => {
@@ -63,6 +70,7 @@ export const useQuizResult = () => {
       status: "not loaded",
       answers: {},
     });
+    lastSentAnswersRef.current = null;
   }, []);
 
   return useMemo(() => ({

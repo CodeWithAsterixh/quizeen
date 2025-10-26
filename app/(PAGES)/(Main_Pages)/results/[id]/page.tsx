@@ -19,6 +19,7 @@ export default function Page() {
   const [quiz, setQuiz] = useState<Quiz>();
   const { targetRef, toPDF } = usePDF();
   const isMobile = useIsMobile();
+  const [pdfMode, setPdfMode] = useState(false);
 
   const findQuizResult = useCallback(async () => {
     try {
@@ -38,19 +39,28 @@ export default function Page() {
     }
   }, [id]);
 
-  function handlePDF() {
-    toPDF({
-      canvas: {
-        mimeType: "image/png",
-      },
-      filename: `${quiz?.title}-(result)`,
-      resolution: 3,
-      method: "save",
-      page: {
-        format: "letter",
-        margin: isMobile ? 30 : 20,
-      },
-    });
+  async function handlePDF() {
+    // Enable PDF-safe styles for capture
+    setPdfMode(true);
+    try {
+      await toPDF({
+        canvas: {
+          mimeType: "image/jpeg",
+          qualityRatio: 0.85,
+        },
+        filename: `${quiz?.title}-result.pdf`,
+        resolution: isMobile ? 2.5 : 3,
+        method: "save",
+        page: {
+          format: "letter",
+          margin: isMobile ? 20 : 14,
+          orientation: "portrait",
+        },
+      });
+    } finally {
+      // Revert PDF-safe styles after capture
+      setPdfMode(false);
+    }
   }
 
   useEffect(() => {
@@ -66,7 +76,7 @@ export default function Page() {
 
   return (
     <div className="w-full flex flex-col gap-2 py-2">
-      <ResultComponent ref={targetRef} attempt={attempt} quiz={quiz} />
+      <ResultComponent ref={targetRef} userName={user.fullName} attempt={attempt} quiz={quiz} pdfMode={pdfMode} />
 
       <div className="w-full flex gap-2 px-2 items-center justify-end">
         <Button
