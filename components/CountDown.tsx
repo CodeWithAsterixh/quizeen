@@ -21,8 +21,9 @@ export function MinuteCountdown({ minutes,setEnd,show }: MinuteCountdownProps) {
     const interval = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
+          // Let the state reach 0 and clear the interval. Do NOT call parent setters here
+          // to avoid updating parent state during a render phase of this component.
           clearInterval(interval);
-          setEnd(true,{})
           return 0;
         }
         return prev - 1;
@@ -30,6 +31,17 @@ export function MinuteCountdown({ minutes,setEnd,show }: MinuteCountdownProps) {
     }, 1000);
     return () => clearInterval(interval);
   }, [minutes]);
+
+  // Call parent 'setEnd' from an effect that reacts to secondsLeft changes.
+  // This ensures we don't trigger parent updates during this component's render phase.
+  useEffect(() => {
+    if (secondsLeft === 0) {
+      // schedule on next tick inside effect to be extra-safe
+      const t = setTimeout(() => setEnd(true, {}), 0);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [secondsLeft, setEnd]);
 
 
   // Helper to format seconds into mm:ss format.

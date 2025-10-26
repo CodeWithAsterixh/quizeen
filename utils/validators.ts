@@ -1,12 +1,28 @@
-export const isValidEmail = (email: string): boolean => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-  
-  export const isValidPassword = (password: string): boolean => {
-    return password.length >= 6;
-  };
-  
-  export const doPasswordsMatch = (password: string, confirmPassword: string): boolean => {
-    return password === confirmPassword;
-  };
-  
+export const validateEmailFormat = (email: string): boolean => {
+  // RFC 5322 compliant email regex
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(email);
+};
+
+export const validatePassword = (password: string): string | null => {
+  if (password.length < 8) {
+    return "Password must be at least 8 characters long";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Password must contain at least one uppercase letter";
+  }
+  if (!/[a-z]/.test(password)) {
+    return "Password must contain at least one lowercase letter";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "Password must contain at least one number";
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    return "Password must contain at least one special character";
+  }
+  return null;
+};
+
+export const isValidEmail = validateEmailFormat;
+export const isValidPassword = (password: string): boolean => !validatePassword(password);
+export const doPasswordsMatch = (password: string, confirmPassword: string): boolean => password === confirmPassword;

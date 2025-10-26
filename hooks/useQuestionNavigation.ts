@@ -45,5 +45,6 @@ export const useQuestionNavigation = (totalQuestions: number) => {
     handlePrev,
     updateAnswer,
     setQuizState, // exposed if you need to manually set status
+    setAnswers, // allow external initialization of answers (resume from storage)
   };
 };

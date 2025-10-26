@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
         </Link>
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-6">
-          {user && role === "admin" && (
+          {user && (role === "admin" || role === "creator") && (
             <Link href={"/new"}>
               <Button>Create New Quiz</Button>
             </Link>
@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
             About
           </Link>
 
-          {role=="admin"||role=="user" ? (
+          {role === "admin" || role === "student" || role === "creator" ? (
             <>
               <Link
                 href="/results"
@@ -119,7 +119,7 @@ const Navbar: React.FC = () => {
                   About
                 </Link>
               </SidebarGroupContent>
-              {role=="admin"||role=="user" && (
+              {role === "admin" || role === "student" && (
                 <SidebarGroupContent className="bg-neutral-100 rounded-md">
                   <Link
                     href="/results"
@@ -131,7 +131,7 @@ const Navbar: React.FC = () => {
             )}
             </SidebarGroup>
 
-            {user &&role==="admin" && (
+            {user && (role === "admin" || role === "creator") && (
               <SidebarGroup>
                 <SidebarGroupContent className="bg-neutral-900 hover:bg-neutral-800 rounded-md">
                   <Link

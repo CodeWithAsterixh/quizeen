@@ -12,13 +12,22 @@ export async function GET(request: Request) {
   await connectToDatabase();
 
   // Get the Authorization header
+  // Try Authorization header first, then fall back to reading cookie header (for HttpOnly access tokens)
+  let token: string | null = null;
   const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.replace("Bearer ", "");
+  } else {
+    const cookieHeader = request.headers.get("cookie");
+    if (cookieHeader) {
+      const parsed = Object.fromEntries(cookieHeader.split(';').map((s) => s.trim().split('=').map(decodeURIComponent)) as [string,string][]);
+      token = parsed['token'] || parsed['authToken'] || null;
+    }
+  }
+
+  if (!token) {
     return NextResponse.json({ message: "Unauthorized: No token provided" }, { status: 401 });
   }
-  
-  // Extract the token from the header
-  const token = authHeader.replace("Bearer ", "");
 
   try {
     // Verify the token
@@ -46,14 +55,22 @@ export async function POST(request: Request) {
   
   // get body
   const body = await request.json() as userType
-  // Get the Authorization header
+  // Try Authorization header first, then fall back to reading cookie header (for HttpOnly access tokens)
+  let token: string | null = null;
   const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.replace("Bearer ", "");
+  } else {
+    const cookieHeader = request.headers.get("cookie");
+    if (cookieHeader) {
+      const parsed = Object.fromEntries(cookieHeader.split(';').map((s) => s.trim().split('=').map(decodeURIComponent)) as [string,string][]);
+      token = parsed['token'] || parsed['authToken'] || null;
+    }
+  }
+
+  if (!token) {
     return NextResponse.json({ message: "Unauthorized: No token provided" }, { status: 401 });
   }
-  
-  // Extract the token from the header
-  const token = authHeader.replace("Bearer ", "");
 
   try {
     // Verify the token

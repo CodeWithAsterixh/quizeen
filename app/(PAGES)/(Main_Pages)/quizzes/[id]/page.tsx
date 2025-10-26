@@ -7,10 +7,11 @@ import QuestionComponent from "@/components/Quiz/Question";
 import ResultComponent from "@/components/ResultComponent";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useQuizProgress } from "@/hooks/useQuizProgress";
+import { useQuizResult } from "@/hooks/useQuizResult";
+import { useQuizTiming } from "@/hooks/useQuizTiming";
 import { useSettingsUpdate } from "@/hooks/useSettingsUpdate";
-import { setUnknownState } from "@/lib/features/unknownSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { QuizAttempt, selectedOptions } from "@/types";
+import { useAppSelector } from "@/lib/hooks";
 import { authInterceptorNext } from "@/utils/authInterceptorNext";
 import { DownloadIcon, Save } from "lucide-react";
 import Link from "next/link";
@@ -25,67 +26,42 @@ export default function Page() {
   const { handleToggleSaveResults } = useSettingsUpdate().actions;
 
   const { targetRef, toPDF } = usePDF();
-  const [quizTiming, setQuizTiming] = useState({
-    started: false,
-    timeLeft: 0,
-    ended: false,
-  });
-  const [resultProcess, setResultProcess] = useState<{
-    result?: QuizAttempt;
-    status: "loading" | "processed" | "not loaded";
-    answers: Record<number, selectedOptions>;
-  }>({
-    status: "not loaded",
-    answers: {},
-  });
+  const { quizTiming, startQuiz, endQuiz, setTimeLeft } = useQuizTiming();
+  const { startQuizProgress, resumeQuizProgress, endQuizProgress } = useQuizProgress();
+  const { resultProcess, handleEnd, updateResultProcess } = useQuizResult();
   const [resave, setResave] = useState(false);
-  const dispatch = useAppDispatch();
+  const [error, setError] = useState<string | null>(null);
 
   function resaveResult() {
     handleToggleSaveResults();
     setResave(true);
   }
 
-  useEffect(() => {
-    if (currentQuiz) {
-      setQuizTiming((qt) => ({
-        ...qt,
-        timeLeft: currentQuiz.duration,
-      }));
+  function handleStartQuiz() {
+    try {
+      startQuizProgress();
+      startQuiz();
+    } catch {
+      setError("Failed to start quiz. Please try again.");
+    }
+  }
+
+  const resumeEffect = useCallback(() => {
+    if (!currentQuiz) return;
+    const resume = resumeQuizProgress();
+    if (resume) {
+      if (resume.ended) {
+        handleEnd(true, {});
+      } else {
+        startQuiz();
+        setTimeLeft(resume.timeLeft);
+      }
     }
   }, [currentQuiz]);
 
-  const handleEnd = useCallback(
-    (end: boolean, answers: Record<number, selectedOptions>) => {
-      setQuizTiming((qt) => ({
-        ...qt,
-        ended: end,
-      }));
-
-      dispatch(
-        setUnknownState({
-          state: {
-            quizId: currentQuiz?._id || "",
-            answers,
-          },
-          from: "quiz-submit",
-        })
-      );
-
-      setResultProcess((re) => ({
-        ...re,
-        answers,
-      }));
-    },
-    [currentQuiz?._id, dispatch]
-  );
-
-  function handleStartQuiz() {
-    setQuizTiming((qt) => ({
-      ...qt,
-      started: true,
-    }));
-  }
+  useEffect(() => {
+    resumeEffect();
+  }, [resumeEffect]);
   function handlePDF() {
     toPDF({
       canvas: {
@@ -107,6 +83,7 @@ export default function Page() {
         <Loader />
         <b>Loading quiz.</b>
         <b>Please wait...</b>
+        {error && <p className="text-red-500">{error}</p>}
       </div>
     );
   }
@@ -115,6 +92,12 @@ export default function Page() {
 
   return (
     <div className="w-full max-w-3xl m-auto py-5 px-2 sm:px-4 flex flex-col gap-4">
+      {error && (
+        <div className="w-full p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <p>Error: {error}</p>
+          <button onClick={() => setError(null)} className="mt-2 underline">Dismiss</button>
+        </div>
+      )}
       {resultProcess.status === "loading" ? (
         <div className="w-full flex flex-col gap-2 items-center justify-center">
           <Loader />
@@ -179,8 +162,12 @@ export default function Page() {
         minutes={quizTiming.timeLeft}
       />
       <QuestionComponent
-        setEnd={handleEnd}
-        setResultProcess={setResultProcess}
+        setEnd={(end, answers) => {
+          handleEnd(end, answers);
+          endQuizProgress(answers);
+          endQuiz(end);
+        }}
+        setResultProcess={updateResultProcess}
         reSave={resave}
         show={
           quizTiming.started &&

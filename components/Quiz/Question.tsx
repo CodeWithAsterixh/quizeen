@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,14 +40,34 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
     handleNext,
     handlePrev,
     updateAnswer,
+    setQuizState,
+    setAnswers,
   } = useQuestionNavigation(currentQuiz?.questions.length || 0);
+
+  // Persist current answers to localStorage for resume/refresh
+  useEffect(() => {
+    try {
+      const key = "ongoingQuizzes";
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const arr = JSON.parse(raw) as any[];
+      const idx = arr.findIndex((a) => a.quizId === currentQuiz?._id);
+      if (idx >= 0) {
+        arr[idx].answers = answers;
+        arr[idx].lastSavedAt = new Date().toISOString();
+        localStorage.setItem(key, JSON.stringify(arr));
+      }
+    } catch{
+      // ignore
+    }
+  }, [answers, currentQuiz]);
 
   // Use our custom hook to get handleSubmit for quiz submission.
   const { handleSubmit } = useSubmitQuiz({
     currentQuizId: currentQuiz?._id || "",
     userId: user?._id || "",
     answers,
-    role:role as "user" | "admin" | "guest",
+  role: role as "student" | "admin" | "guest",
     saveResults,
     setResultProcess,
     setEnd,
@@ -57,6 +78,62 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
       handleSubmit();
     }
   }, [reSave, handleSubmit]);
+
+  // On mount, try to populate answers from localStorage (or server-synced local copy)
+  useEffect(() => {
+    try {
+      const key = "ongoingQuizzes";
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+      const arr = JSON.parse(raw) as any[];
+      const entry = arr.find((a) => a.quizId === currentQuiz?._id);
+      if (entry && entry.answers) {
+        setAnswers(entry.answers);
+        // set current to the last answered question index (or keep at 0)
+        const answeredIndexes = Object.keys(entry.answers)
+          .map((k) => Number(k))
+          .filter((n) => !Number.isNaN(n))
+          .sort((a, b) => a - b);
+        if (answeredIndexes.length > 0) {
+          const last = Math.max(...answeredIndexes) - 1; // zero-based
+          setQuizState((st) => ({ ...st, current: Math.min(last, (currentQuiz?.questions.length || 1) - 1) }));
+        }
+      }
+    } catch{
+      // ignore
+    }
+  // run once on mount or when quiz changes
+  }, [currentQuiz, setAnswers, setQuizState]);
+
+  // Listen for updates to ongoing progress (e.g., merged server progress)
+  useEffect(() => {
+    const handler = (ev: any) => {
+      try {
+        const quizId = ev?.detail?.quizId;
+        if (!quizId || quizId !== currentQuiz?._id) return;
+        const key = "ongoingQuizzes";
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        const arr = JSON.parse(raw) as any[];
+        const entry = arr.find((a) => a.quizId === currentQuiz?._id);
+        if (entry && entry.answers) {
+          setAnswers(entry.answers);
+          const answeredIndexes = Object.keys(entry.answers)
+            .map((k) => Number(k))
+            .filter((n) => !Number.isNaN(n))
+            .sort((a, b) => a - b);
+          if (answeredIndexes.length > 0) {
+            const last = Math.max(...answeredIndexes) - 1; // zero-based
+            setQuizState((st) => ({ ...st, current: Math.min(last, (currentQuiz?.questions.length || 1) - 1) }));
+          }
+        }
+      } catch{
+        // ignore
+      }
+    };
+    window.addEventListener('ongoingProgressUpdated', handler as EventListener);
+    return () => window.removeEventListener('ongoingProgressUpdated', handler as EventListener);
+  }, [currentQuiz, setAnswers, setQuizState]);
 
   const currentQuestion = currentQuiz?.questions[quizState.current];
 
@@ -102,14 +179,53 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
               )}
             >
               {quizState.current !== 0 && (
-                <Button variant="default" onClick={handlePrev}>
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    handlePrev();
+                    // persist navigation state
+                    try {
+                      const key = "ongoingQuizzes";
+                      const raw = localStorage.getItem(key);
+                      if (raw) {
+                        const arr = JSON.parse(raw) as any[];
+                        const idx = arr.findIndex((a) => a.quizId === currentQuiz?._id);
+                        if (idx >= 0) {
+                          arr[idx].lastSavedAt = new Date().toISOString();
+                          arr[idx].answers = answers;
+                          localStorage.setItem(key, JSON.stringify(arr));
+                        }
+                      }
+                    } catch{
+                      // ignore
+                    }
+                  }}
+                >
                   Previous
                 </Button>
               )}
               {quizState.current !== currentQuiz.questions.length - 1 ? (
                 <Button
                   disabled={!answers[quizState.current + 1]}
-                  onClick={handleNext}
+                  onClick={() => {
+                    handleNext();
+                    // persist navigation state on next
+                    try {
+                      const key = "ongoingQuizzes";
+                      const raw = localStorage.getItem(key);
+                      if (raw) {
+                        const arr = JSON.parse(raw) as any[];
+                        const idx = arr.findIndex((a) => a.quizId === currentQuiz?._id);
+                        if (idx >= 0) {
+                          arr[idx].lastSavedAt = new Date().toISOString();
+                          arr[idx].answers = answers;
+                          localStorage.setItem(key, JSON.stringify(arr));
+                        }
+                      }
+                    } catch{
+                      // ignore
+                    }
+                  }}
                 >
                   Next
                 </Button>

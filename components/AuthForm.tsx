@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
+import api from "@/utils/api";
 
 interface AuthFormProps {
   type: "login" | "register"; // Distinguishes between login and registration modes
@@ -24,6 +25,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"student" | "creator">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false)  
 
@@ -45,12 +47,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setLoading(true)
+    setLoading(true);
+
     // Validate password match for registration
     if (type === "register" && password !== confirmPassword) {
       setError("Passwords do not match.");
-      setLoading(false)
+      setLoading(false);
       return;
+    }
+
+    try {
+      // Pre-flight request to get CSRF token
+      await api.get('/auth/csrf');
+    } catch (error) {
+      console.error('Failed to get CSRF token:', error);
     }
 
     try {
@@ -58,9 +68,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
         // Dispatch the login async thunk and unwrap the result
         const res = await dispatch(loginUser({ email, password })).unwrap();
         callSuccess(res)
-      } else {
-        // Dispatch the register async thunk and unwrap the result
-        await dispatch(registerUser({ fullName, email, password, confirmPassword })).unwrap();
+  } else {
+  // Dispatch the register async thunk and unwrap the result
+  await dispatch(registerUser({ fullName, email, password, confirmPassword, role })).unwrap();
         const res = await dispatch(loginUser({ email, password })).unwrap();
 
         callSuccess(res)
@@ -106,6 +116,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
               placeholder="Enter your full name"
               required
             />
+          </div>
+        )}
+        {type === "register" && (
+          <div className="mb-4">
+            <Label htmlFor="role">Register as</Label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value as "student" | "creator")}
+              className="w-full border rounded p-2"
+            >
+              <option value="student">Student (Quiz Taker)</option>
+              <option value="creator">Creator (Quiz Author)</option>
+            </select>
           </div>
         )}
         <div className="mb-4">

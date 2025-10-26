@@ -8,6 +8,6 @@ type Props = {
 
 export default function Layout({ children }: Props) {
   const {role} = useAppSelector(s=>s.auth)
-  if(role=="admin")return children
+  if(role === "admin" || role === "creator") return children
   return null
 }

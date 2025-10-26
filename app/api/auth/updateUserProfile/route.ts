@@ -9,20 +9,28 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 export async function PUT(request: Request) {
   await connectToDatabase();
 
-  // Get the Authorization header
-  const authHeader = request.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ message: "Unauthorized: No token provided" }, { status: 401 });
+  // Token may be provided via Authorization header or cookies (authToken/token)
+  let token: string | null = null;
+  const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.replace('Bearer ', '');
+  } else {
+    const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';
+    const parsed = Object.fromEntries(
+      cookieHeader ? cookieHeader.split(';').map((s) => s.trim().split('=').map(decodeURIComponent)) : []
+    ) as Record<string, string>;
+    token = parsed['authToken'] || parsed['token'] || null;
   }
-  
-  // Extract the token
-  const token = authHeader.replace("Bearer ", "");
-  
+
+  if (!token) {
+    return NextResponse.json({ message: 'Unauthorized: No token provided' }, { status: 401 });
+  }
+
   let decoded: any;
   try {
     decoded = jwt.verify(token, JWT_SECRET);
   } catch (error: any) {
-    return NextResponse.json({ message: "Invalid or expired token", error: error.message }, { status: 401 });
+    return NextResponse.json({ message: 'Invalid or expired token', error: error.message }, { status: 401 });
   }
   
   // Parse the request body for updated data
