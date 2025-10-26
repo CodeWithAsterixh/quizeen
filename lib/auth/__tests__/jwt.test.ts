@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { signJWT, verifyToken, TokenPayload } from '@/lib/auth/jwt';
 
 describe('JWT Utilities', () => {

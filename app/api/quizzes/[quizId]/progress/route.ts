@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongo";
 import { QuizProgress } from "@/models/QuizProgress";
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ quiz
       try {
         const decoded: any = jwt.verify(token, JWT_SECRET);
         userId = decoded.userId;
-      } catch (e) {
+      } catch{
         // ignore
       }
     } else {
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ quiz
           try {
             const decoded: any = jwt.verify(token, JWT_SECRET);
             userId = decoded.userId;
-          } catch (e) {
+          } catch {
             // ignore
           }
         }

@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongo";
-import { User } from "@/models/User";
-import { RefreshToken } from "@/models/RefreshToken";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getRefreshTokenFromCookies, setAccessTokenCookie, setRefreshTokenCookie } from "@/lib/auth/cookies";
-import jwt from "jsonwebtoken";
 import { signJWT } from "@/lib/auth/jwt";
+import { connectToDatabase } from "@/lib/mongo";
+import { RefreshToken } from "@/models/RefreshToken";
+import { User } from "@/models/User";
+import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
 
 // POST /api/auth/refresh
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     await connectToDatabase();
 
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     let decoded: any;
     try {
       decoded = jwt.verify(oldRefresh, JWT_SECRET) as any;
-    } catch (e) {
+    } catch {
       return NextResponse.json({ message: "Invalid refresh token" }, { status: 401 });
     }
 
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Revoke old token and create new one
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const newTokenId = require('crypto').randomBytes(16).toString('hex');
     const expiresIn = 30 * 24 * 60 * 60; // 30 days
     const newRefreshJwt = jwt.sign({ userId, jti: newTokenId }, JWT_SECRET, { algorithm: 'HS256', expiresIn: `${expiresIn}s` });

@@ -7,21 +7,20 @@ import QuestionComponent from "@/components/Quiz/Question";
 import ResultComponent from "@/components/ResultComponent";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSettingsUpdate } from "@/hooks/useSettingsUpdate";
-import { useQuizTiming } from "@/hooks/useQuizTiming";
 import { useQuizProgress } from "@/hooks/useQuizProgress";
 import { useQuizResult } from "@/hooks/useQuizResult";
+import { useQuizTiming } from "@/hooks/useQuizTiming";
+import { useSettingsUpdate } from "@/hooks/useSettingsUpdate";
 import { useAppSelector } from "@/lib/hooks";
-import { QuizAttempt, selectedOptions } from "@/types";
 import { authInterceptorNext } from "@/utils/authInterceptorNext";
 import { DownloadIcon, Save } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePDF } from "react-to-pdf";
 
 export default function Page() {
   const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
-  const { role, user } = useAppSelector((s) => s.auth);
+  const { role } = useAppSelector((s) => s.auth);
   const { saveResults } = useAppSelector((s) => s.settings);
   const isMobile = useIsMobile();
   const { handleToggleSaveResults } = useSettingsUpdate().actions;
@@ -29,7 +28,7 @@ export default function Page() {
   const { targetRef, toPDF } = usePDF();
   const { quizTiming, startQuiz, endQuiz, setTimeLeft } = useQuizTiming();
   const { startQuizProgress, resumeQuizProgress, endQuizProgress } = useQuizProgress();
-  const { resultProcess, handleEnd, setResult, setLoading, updateResultProcess } = useQuizResult();
+  const { resultProcess, handleEnd, updateResultProcess } = useQuizResult();
   const [resave, setResave] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +41,7 @@ export default function Page() {
     try {
       startQuizProgress();
       startQuiz();
-    } catch (error) {
+    } catch {
       setError("Failed to start quiz. Please try again.");
     }
   }

@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { connectToDatabase } from "@/lib/mongo";
 import { Quiz } from "@/models/Quiz";
 import { QuizResult } from "@/models/QuizResult";
@@ -29,7 +31,7 @@ export async function POST(req: Request) {
         if (quizIndex >= 0 && parts.length > quizIndex + 1) {
           quizId = parts[quizIndex + 1];
         }
-      } catch (e) {
+      } catch{
         // ignore
       }
     }
@@ -51,11 +53,10 @@ export async function POST(req: Request) {
     let derivedRole = bodyRole || "guest";
     if (token) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const decoded: any = jwt.verify(token, JWT_SECRET);
         if (decoded?.userId) derivedUserId = decoded.userId;
         if (decoded?.role) derivedRole = decoded.role;
-      } catch (e) {
+      } catch{
         // ignore invalid token; we fallback to provided body values
       }
     }
@@ -81,7 +82,6 @@ export async function POST(req: Request) {
 
     let score = 0;
     // Build details array
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     // Cast answers to any for flexible indexing (support both numeric and string keys).
     const answersAny: any = answers as any;
     const details: details[] = quiz.questions.map((question: any, ind: number) => {
@@ -135,7 +135,7 @@ export async function POST(req: Request) {
           .padStart(2, "0");
         const ss = (secs % 60).toString().padStart(2, "0");
         completionTime = `${mm}:${ss}`;
-      } catch (e) {
+      } catch{
         completionTime = "unknown";
       }
     }
@@ -165,7 +165,6 @@ export async function POST(req: Request) {
     });
     await result.save();
     return NextResponse.json(result);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("Quiz submission error:", error);
     return NextResponse.json({ message: "Failed to submit quiz" }, { status: 500 });

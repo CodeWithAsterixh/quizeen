@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { useAppSelector } from '@/lib/hooks';
 import { selectedOptions } from '@/types';

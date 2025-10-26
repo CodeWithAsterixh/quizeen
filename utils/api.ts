@@ -35,7 +35,7 @@ api.interceptors.response.use(
           // Retry original request (cookies will be sent automatically)
           return api(originalRequest);
         }
-      } catch (refreshErr) {
+      } catch{
         // Refresh failed — fall through to reject original error
         return Promise.reject(error);
       }
