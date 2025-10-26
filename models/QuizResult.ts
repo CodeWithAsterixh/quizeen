@@ -47,6 +47,12 @@ const QuizResultSchema: Schema<IQuizResult> = new Schema(
         correctAnswer: { type: String, required: true },
         isCorrect: { type: Boolean, required: true },
         timeTaken: { type: String, required: true },
+        // Optional snapshot of the question content to aid result reconstruction and debugging
+        questionText: { type: String, required: false },
+        options: {
+          type: Object,
+          required: false,
+        },
       },
     ],
     completionTime: {

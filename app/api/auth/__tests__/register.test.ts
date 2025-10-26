@@ -25,7 +25,7 @@ describe('Register Route Handler', () => {
     const user = await User.findOne({ email: testUser.email });
     expect(user).toBeTruthy();
     expect(user?.fullName).toBe(testUser.fullName);
-    expect(user?.role).toBe('user');
+  expect(user?.role).toBe('student');
 
     // Verify password was hashed
     const passwordIsValid = await bcrypt.compare(testUser.password, user!.passwordHash);

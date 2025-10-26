@@ -131,7 +131,7 @@ const authSlice = createSlice({
           state.user = action.payload.user;
           state.token = action.payload.token;
           state.loading = false;
-          state.role = action.payload.user?.role||"user";
+          state.role = action.payload.user?.role||"student";
         }
       )
       .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {

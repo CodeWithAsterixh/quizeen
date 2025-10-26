@@ -1,4 +1,6 @@
-import { setTokenCookie, signJWT } from "@/lib/auth/jwt";
+import { signJWT } from "@/lib/auth/jwt";
+import { setAccessTokenCookie, setRefreshTokenCookie } from '@/lib/auth/cookies';
+import { createRefreshToken } from '@/lib/auth/refresh';
 import { AuthError } from '@/lib/errors';
 import { connectToDatabase } from "@/lib/mongo";
 import { validateRequest } from "@/lib/validation/validate";
@@ -28,7 +30,7 @@ const handleLogin: NextRequestHandler = async (req) => {
   const user = await User.findOne({ email: normalizedEmail });
 
   if (!user || !await bcrypt.compare(password, user.passwordHash)) {
-    throw new AuthError('Invalid email or password', 'INVALID_CREDENTIALS');
+    return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
   }
 
   // Generate JWT token with user ID and role
@@ -38,13 +40,13 @@ const handleLogin: NextRequestHandler = async (req) => {
   });
 
   // Create response
-  const response = NextResponse.json({ 
-    user: user.toJSON(),
-    success: true 
-  });
+  const response = NextResponse.json({ user: user.toJSON(), success: true });
 
-  // Set secure HTTP-only cookie
-  await setTokenCookie(token);
+  // create refresh token and set both cookies on the response before returning
+  const { refreshToken } = await createRefreshToken(user._id.toString());
+
+  setAccessTokenCookie(response, token);
+  setRefreshTokenCookie(response, refreshToken);
 
   return response;
 }

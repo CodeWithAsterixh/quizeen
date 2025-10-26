@@ -3,7 +3,7 @@ import { signJWT, verifyToken, TokenPayload } from '@/lib/auth/jwt';
 describe('JWT Utilities', () => {
   const mockPayload: TokenPayload = {
     userId: '123',
-    role: 'user'
+    role: 'student'
   };
 
   it('should sign and verify a token successfully', () => {
@@ -21,20 +21,16 @@ describe('JWT Utilities', () => {
   });
 
   it('should throw error for invalid token', () => {
-    expect(() => {
-      verifyToken('invalid-token');
-    }).toThrow('Invalid token');
+    expect(() => verifyToken('invalid-token')).toThrow('Invalid token');
   });
 
   it('should throw error for token with invalid payload structure', () => {
     // Create token with invalid payload
     const invalidToken = signJWT({ 
       userId: '123',
-      role: 'invalid-role' as 'user' 
+      role: 'invalid-role' as any
     });
 
-    expect(() => {
-      verifyToken(invalidToken);
-    }).toThrow('Invalid token payload');
+    expect(() => verifyToken(invalidToken)).toThrow('Invalid token payload');
   });
 });

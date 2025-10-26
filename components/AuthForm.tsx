@@ -25,6 +25,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"student" | "creator">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false)  
 
@@ -67,9 +68,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
         // Dispatch the login async thunk and unwrap the result
         const res = await dispatch(loginUser({ email, password })).unwrap();
         callSuccess(res)
-      } else {
-        // Dispatch the register async thunk and unwrap the result
-        await dispatch(registerUser({ fullName, email, password, confirmPassword })).unwrap();
+  } else {
+  // Dispatch the register async thunk and unwrap the result
+  await dispatch(registerUser({ fullName, email, password, confirmPassword, role })).unwrap();
         const res = await dispatch(loginUser({ email, password })).unwrap();
 
         callSuccess(res)
@@ -115,6 +116,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ type,intercept,onSuccess }) => {
               placeholder="Enter your full name"
               required
             />
+          </div>
+        )}
+        {type === "register" && (
+          <div className="mb-4">
+            <Label htmlFor="role">Register as</Label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value as "student" | "creator")}
+              className="w-full border rounded p-2"
+            >
+              <option value="student">Student (Quiz Taker)</option>
+              <option value="creator">Creator (Quiz Author)</option>
+            </select>
           </div>
         )}
         <div className="mb-4">

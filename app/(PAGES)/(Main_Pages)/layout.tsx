@@ -2,10 +2,9 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { getUserProfile, setRole, setToken } from "@/lib/features/authSlice";
+import { getUserProfile, setRole } from "@/lib/features/authSlice";
 import { getResults } from "@/lib/features/quizSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import Cookies from 'js-cookie';
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,17 +16,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, loading, error,role,token } = useAppSelector((state) => state.auth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true); // Ensures proper loading before rendering
   useEffect(() => {
-    const storedToken = Cookies.get("token") || null;
-    
-    dispatch(setToken(storedToken))
+    // Try to fetch the current user profile on mount. We rely on cookies being sent by the browser
+    // (access token is HttpOnly). This avoids trying to read HttpOnly cookies from JS.
+    dispatch(getUserProfile()).finally(() => setIsCheckingAuth(false));
   }, [dispatch]);
-  useEffect(() => {
-    if (token) {
-      dispatch(getUserProfile()).finally(() => setIsCheckingAuth(false));
-    } else {
-      setIsCheckingAuth(false);
-    }
-  }, [dispatch,token]);
 
   useEffect(() => {
     if (user) {

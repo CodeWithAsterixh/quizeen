@@ -22,7 +22,25 @@ api.interceptors.response.use(
     }
     return response;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    // If we receive 401 and the request was not already retried, try to call refresh endpoint
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        // Attempt to refresh tokens (server will read HttpOnly refresh cookie)
+        const refreshResponse = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
+        if (refreshResponse.status === 200 || refreshResponse.status === 201 || refreshResponse.status === 204 || (refreshResponse.data && refreshResponse.data.ok)) {
+          // Retry original request (cookies will be sent automatically)
+          return api(originalRequest);
+        }
+      } catch (refreshErr) {
+        // Refresh failed — fall through to reject original error
+        return Promise.reject(error);
+      }
+    }
+
     return Promise.reject(error);
   }
 );
@@ -30,8 +48,9 @@ api.interceptors.response.use(
 // Attach the tokens to requests if available
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
+    // If an access token is available in a readable cookie (non-HttpOnly), attach it as Authorization.
+    // Note: in this app access tokens are HttpOnly and will be sent by the browser automatically.
     const token = Cookies.get("token");
-    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

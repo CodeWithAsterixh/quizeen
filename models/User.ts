@@ -5,7 +5,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IUser extends Document {
   fullName: string;
   email: string;
-  role:"user"|"admin";
+  role: "student" | "admin" | "creator" | "guest" | "none";
   passwordHash: string;
   preferences: SettingsState;
   createdAt: Date;
@@ -28,6 +28,7 @@ const UserSchema: Schema<IUser> = new Schema(
       type: String,
       required: true,
       lowercase: true,
+      enum: ['student', 'admin', 'creator', 'guest', 'none'],
     },
     passwordHash: {
       type: String,
@@ -48,12 +49,18 @@ const UserSchema: Schema<IUser> = new Schema(
   {
     timestamps: true,
     toJSON: {
-      transform: (doc, ret) => {
-        ret._id = ret._id.toString();
-        ret.createdAt = ret.createdAt.toISOString();
-        ret.updatedAt = ret.updatedAt.toISOString();
-        delete ret.__v;
-        delete ret.passwordHash; // Always remove password hash from JSON
+      transform: (doc: any, ret: any) => {
+        // normalize _id and timestamps for JSON consumers
+        if (ret && ret._id) ret._id = ret._id.toString();
+        if (ret && ret.createdAt) ret.createdAt = (ret.createdAt as Date).toISOString();
+        if (ret && ret.updatedAt) ret.updatedAt = (ret.updatedAt as Date).toISOString();
+        // remove internal fields
+        try {
+          delete (ret as any).__v;
+          delete (ret as any).passwordHash; // Always remove password hash from JSON
+        } catch (_) {
+          // ignore
+        }
         return ret;
       },
     },

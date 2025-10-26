@@ -2,6 +2,11 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { generateCsrfToken } from "./lib/security/csrf";
+import { validateEnv } from './lib/env';
+
+// Run environment validation early in middleware initialization.
+// This throws during startup if required env vars are missing.
+validateEnv();
 
 export function middleware(request: NextRequest) {
   // Get navigation information

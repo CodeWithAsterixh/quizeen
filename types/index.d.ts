@@ -6,7 +6,7 @@ export interface User {
   passwordHash?: string;
   createdAt: string;
   updatedAt: string;
-  role: "user" | "admin";
+  role: "student" | "admin" | "creator" | "guest" | "none";
   preferences: SettingsState;
 }
 
@@ -25,6 +25,7 @@ export interface RegisterPayload {
   email: string;
   password: string;
   confirmPassword: string;
+  role?: "student" | "creator";
 }
 
 export type selectedOptions = "A" | "B" | "C" | "D";
@@ -70,7 +71,7 @@ export interface QuizAttempt {
 }
 
 // redux-state.interface.ts
-export type userRoles = "user"|"guest"|"admin"|"none"
+export type userRoles = "student"|"guest"|"admin"|"creator"|"none"
 export interface AuthState {
   user: User | null;
   token: string | null;
@@ -105,8 +106,8 @@ export interface QuestionResultSubmission {
   quizId: string;
   userId?: string;
   answers: Record<number, selectedOptions>;
-  role:userRoles,
-  saveResult: boolean
+  role: userRoles;
+  saveResult: boolean;
 }
 
 export interface QuestionResult {

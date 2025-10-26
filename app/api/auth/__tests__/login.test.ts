@@ -8,7 +8,7 @@ describe('Login Route Handler', () => {
     email: 'test@example.com',
     password: 'TestPassword123!',
     fullName: 'Test User',
-    role: 'user' as const
+    role: 'student' as const
   };
 
   beforeEach(async () => {
