@@ -4,13 +4,25 @@ const requiredEnvs = {
     required: true,
     minLength: 20, // Minimum length for a valid MongoDB URI
   },
+  DATABASE_URL: {
+    required: false,
+    minLength: 10,
+  },
   JWT_SECRET: {
     required: true,
     minLength: 32,
   },
+  NEXT_PUBLIC_APP_URL: {
+    required: true,
+    minLength: 8,
+  },
   NODE_ENV: {
     required: true,
     allowedValues: ['development', 'production', 'test'],
+  },
+  SENTRY_DSN: {
+    required: false,
+    minLength: 10,
   },
 } as const;
 

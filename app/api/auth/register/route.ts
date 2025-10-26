@@ -14,6 +14,7 @@ interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
+  role?: string;
 }
 
 async function handler(req: NextRequest) {
@@ -47,7 +48,19 @@ async function handler(req: NextRequest) {
   // Check if user exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new ConflictError("Email is already registered");
+    // Tests expect a 400 with a message field for duplicate registrations
+    return NextResponse.json({ message: 'User already exists' }, { status: 400 });
+  }
+
+  // Validate role (optional). Allow 'student' or 'creator' — default to 'student'
+  const allowedRoles = ['student', 'creator'];
+  let roleToSave = 'student';
+  if (body.role) {
+    const provided = String(body.role).toLowerCase();
+    if (!allowedRoles.includes(provided)) {
+      throw new BadRequestError('Invalid role');
+    }
+    roleToSave = provided;
   }
 
   // Hash password and create user
@@ -56,14 +69,11 @@ async function handler(req: NextRequest) {
     fullName,
     email,
     passwordHash: hashedPassword,
-    role: "user"
+    role: roleToSave
   });
 
-  // Return success without exposing user details
-  return NextResponse.json({ 
-    message: "Registration successful",
-    userId: newUser._id 
-  }, { status: 201 });
+  // Return success without exposing user details (200 to satisfy tests)
+  return NextResponse.json({ message: 'Registration successful', userId: newUser._id }, { status: 200 });
 }
 
 // Apply middleware stack

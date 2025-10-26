@@ -10,18 +10,20 @@ import { Quiz } from "@/types";
 import { SearchIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const filterQuizzes = (quizzes: Quiz[], filter: string) => {
+  return quizzes.filter(
+    (quiz) =>
+      quiz.title.includes(filter) ||
+      quiz.description?.includes(filter) ||
+      quiz.createdBy.includes(filter)
+  );
+}
 const QuizzesPage = () => {
   const dispatch = useAppDispatch();
   const { quizzes, loading, error } = useAppSelector((state) => state.quiz);
   const [searchFilterInput, setSearchFilterInput] = useState("");
-
-  const filteredQuiz = quizzes.filter(
-    (quiz) =>
-      quiz.title.includes(searchFilterInput) ||
-      quiz.description?.includes(searchFilterInput)||
-      quiz.createdBy.includes(searchFilterInput)
-  )
-  const [searchFilter, setSearchFilter] = useState<Quiz[]>(filteredQuiz);
+  console.log("Quizzes fetched:", quizzes);
+  const [searchFilter, setSearchFilter] = useState<Quiz[]>(filterQuizzes(quizzes, searchFilterInput));
 
   useEffect(() => {
     dispatch(fetchQuizzes()); 
@@ -38,7 +40,7 @@ const QuizzesPage = () => {
 
   const handleSearch = () => {
     setSearchFilter(
-      filteredQuiz
+      filterQuizzes(quizzes, searchFilterInput)
     );
   };
 

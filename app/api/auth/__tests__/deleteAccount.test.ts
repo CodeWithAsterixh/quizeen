@@ -8,7 +8,7 @@ describe('Delete Account Route Handler', () => {
   const testUser = {
     email: 'test@example.com',
     fullName: 'Test User',
-    role: 'user'
+    role: 'student'
   };
 
   let authToken: string;
@@ -21,7 +21,7 @@ describe('Delete Account Route Handler', () => {
       passwordHash: 'notneededforthistest'
     });
     userId = user._id.toString();
-    authToken = await signJWT({ userId, role: 'user' });
+  authToken = signJWT({ userId, role: 'student' });
   });
 
   it('should delete user account when authenticated', async () => {

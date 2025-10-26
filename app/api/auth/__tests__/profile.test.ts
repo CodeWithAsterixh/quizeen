@@ -8,7 +8,7 @@ describe('Profile Route Handler', () => {
   const testUser = {
     email: 'test@example.com',
     fullName: 'Test User',
-    role: 'user'
+    role: 'student'
   };
 
   let authToken: string;
@@ -19,7 +19,7 @@ describe('Profile Route Handler', () => {
       ...testUser,
       passwordHash: 'notneededforthistest'
     });
-    authToken = await signJWT({ userId: user._id.toString(), role: 'user' });
+  authToken = signJWT({ userId: user._id.toString(), role: 'student' });
   });
 
   it('should return user profile when authenticated', async () => {
@@ -64,8 +64,8 @@ describe('Profile Route Handler', () => {
   });
 
   it('should handle non-existent user', async () => {
-    // Create token with non-existent user ID
-    const invalidToken = await signJWT({ userId: '000000000000000000000000', role: 'user' });
+  // Create token with non-existent user ID
+  const invalidToken = signJWT({ userId: '000000000000000000000000', role: 'student' });
     
     const request = createMockNextRequest({
       method: 'GET',

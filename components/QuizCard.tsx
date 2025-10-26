@@ -38,7 +38,7 @@ const QuizCard: React.FC<QuizCardProps> = ({ quiz }) => {
             Take Quiz
           </Button>
         </Link>
-        {role==="admin"&&<>
+  {(role === "admin" || role === "creator") && <>
           <Link href={`/quizzes/${quiz._id}/edit`}>
         <Button variant={"ghost"} className="!px-2.5 rounded-full">
           <PencilLine/>

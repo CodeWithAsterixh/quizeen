@@ -115,7 +115,7 @@ const AccountPage: React.FC = () => {
           <div className="flex items-center gap-3">
           <Button onClick={() => setEditing(true)}>Edit Profile</Button>
          {
-          user && user.role === 'user' &&  <UseModal
+          user && user.role === 'student' &&  <UseModal
           trigger={<Button variant={"destructive"}>Delete Account</Button>}
           contentHeader={{
             title: "Delete Account",

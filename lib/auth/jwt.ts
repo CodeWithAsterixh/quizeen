@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+// cookie helpers moved to lib/auth/cookies.ts
 
 export interface TokenPayload {
   userId: string;
-  role: 'user' | 'admin';
+  role: 'student' | 'admin' | 'creator' | 'guest' | 'none';
   iat?: number;
   exp?: number;
 }
@@ -27,32 +27,22 @@ export function signJWT(payload: TokenPayload): string {
 }
 
 export function verifyToken(token: string): TokenPayload {
+  let decoded: jwt.JwtPayload;
   try {
-    const decoded = jwt.verify(token, JWT_SECRET!) as jwt.JwtPayload;
-    
-    // Validate the payload structure
-    if (!decoded.userId || !decoded.role || 
-        !['user', 'admin'].includes(decoded.role)) {
-      throw new Error('Invalid token payload');
-    }
-    
-    return {
-      userId: decoded.userId,
-      role: decoded.role as 'user' | 'admin',
-      iat: decoded.iat,
-      exp: decoded.exp
-    };
-  } catch {
+    decoded = jwt.verify(token, JWT_SECRET!) as jwt.JwtPayload;
+  } catch (err) {
     throw new Error('Invalid token');
   }
-}
 
-export async function setTokenCookie(token: string): Promise<void> {
-  (await cookies()).set('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 8 * 60 * 60 // 8 hours
-  });
+  // Validate the payload structure
+  if (!decoded.userId || !decoded.role || !['student', 'admin', 'creator', 'guest', 'none'].includes(decoded.role)) {
+    throw new Error('Invalid token payload');
+  }
+
+  return {
+    userId: decoded.userId,
+    role: decoded.role as 'student' | 'admin' | 'creator' | 'guest' | 'none',
+    iat: decoded.iat,
+    exp: decoded.exp,
+  };
 }

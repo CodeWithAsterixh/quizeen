@@ -9,7 +9,7 @@ describe('Update User Profile Route Handler', () => {
   const testUser = {
     email: 'test@example.com',
     fullName: 'Test User',
-    role: 'user',
+    role: 'student',
     password: 'CurrentPassword123!'
   };
 
@@ -25,7 +25,7 @@ describe('Update User Profile Route Handler', () => {
       passwordHash: hashedPassword
     });
     userId = user._id.toString();
-    authToken = await signJWT({ userId, role: 'user' });
+  authToken = signJWT({ userId, role: 'student' });
   });
 
   it('should update user profile when authenticated', async () => {
