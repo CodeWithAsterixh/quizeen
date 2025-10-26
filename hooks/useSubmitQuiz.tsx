@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback } from "react";
 import { useAppDispatch } from "@/lib/hooks";
 import { submitQuiz } from "@/lib/features/quizSlice";
@@ -53,7 +54,7 @@ export const useSubmitQuiz = ({
           if (entry && entry.startedAt) startedAt = entry.startedAt;
         }
       }
-    } catch (e) {
+    } catch{
       // ignore
     }
 

@@ -46,7 +46,7 @@ export async function verifyRefreshToken(token: string) {
     if (dbToken.expiresAt < new Date()) throw new Error('Refresh token expired');
 
     return { tokenId, userId, dbToken };
-  } catch (err) {
+  } catch {
     throw new Error('Invalid refresh token');
   }
 }
@@ -54,7 +54,7 @@ export async function verifyRefreshToken(token: string) {
 export async function rotateRefreshToken(oldToken: string) {
   await connectToDatabase();
 
-  const { tokenId, userId, dbToken } = await verifyRefreshToken(oldToken);
+  const { userId, dbToken } = await verifyRefreshToken(oldToken);
 
   // revoke old token and create a new one
   if (dbToken.revoked) throw new Error('Token already revoked');

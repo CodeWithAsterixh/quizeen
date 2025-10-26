@@ -1,7 +1,6 @@
-import { signJWT } from "@/lib/auth/jwt";
 import { setAccessTokenCookie, setRefreshTokenCookie } from '@/lib/auth/cookies';
+import { signJWT } from "@/lib/auth/jwt";
 import { createRefreshToken } from '@/lib/auth/refresh';
-import { AuthError } from '@/lib/errors';
 import { connectToDatabase } from "@/lib/mongo";
 import { validateRequest } from "@/lib/validation/validate";
 import { authRateLimiter } from '@/middleware/rateLimiter';

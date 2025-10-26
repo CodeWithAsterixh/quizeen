@@ -30,7 +30,7 @@ export function verifyToken(token: string): TokenPayload {
   let decoded: jwt.JwtPayload;
   try {
     decoded = jwt.verify(token, JWT_SECRET!) as jwt.JwtPayload;
-  } catch (err) {
+  } catch {
     throw new Error('Invalid token');
   }
 

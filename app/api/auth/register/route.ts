@@ -1,4 +1,4 @@
-import { BadRequestError, ConflictError } from "@/lib/errors";
+import { BadRequestError } from "@/lib/errors";
 import { connectToDatabase } from "@/lib/mongo";
 import { composeMiddleware } from "@/middleware/compose";
 import { authRateLimiter } from "@/middleware/rateLimiter";

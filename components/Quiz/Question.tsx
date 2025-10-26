@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,7 +57,7 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
         arr[idx].lastSavedAt = new Date().toISOString();
         localStorage.setItem(key, JSON.stringify(arr));
       }
-    } catch (e) {
+    } catch{
       // ignore
     }
   }, [answers, currentQuiz]);
@@ -98,7 +99,7 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
           setQuizState((st) => ({ ...st, current: Math.min(last, (currentQuiz?.questions.length || 1) - 1) }));
         }
       }
-    } catch (e) {
+    } catch{
       // ignore
     }
   // run once on mount or when quiz changes
@@ -126,7 +127,7 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
             setQuizState((st) => ({ ...st, current: Math.min(last, (currentQuiz?.questions.length || 1) - 1) }));
           }
         }
-      } catch (e) {
+      } catch{
         // ignore
       }
     };
@@ -195,7 +196,7 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
                           localStorage.setItem(key, JSON.stringify(arr));
                         }
                       }
-                    } catch (e) {
+                    } catch{
                       // ignore
                     }
                   }}
@@ -221,7 +222,7 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
                           localStorage.setItem(key, JSON.stringify(arr));
                         }
                       }
-                    } catch (e) {
+                    } catch{
                       // ignore
                     }
                   }}

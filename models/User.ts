@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SettingsState } from "@/types";
 import mongoose, { Document, Schema } from "mongoose";
 
@@ -58,7 +59,7 @@ const UserSchema: Schema<IUser> = new Schema(
         try {
           delete (ret as any).__v;
           delete (ret as any).passwordHash; // Always remove password hash from JSON
-        } catch (_) {
+        } catch {
           // ignore
         }
         return ret;

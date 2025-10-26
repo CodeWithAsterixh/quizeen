@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth/jwt';
 import { cookies } from 'next/headers';
@@ -36,7 +37,7 @@ export async function withAuth(
     let payload: TokenPayload;
     try {
       payload = verifyToken(token.value);
-    } catch (err) {
+    } catch {
       return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
     }
 
