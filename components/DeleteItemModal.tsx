@@ -15,7 +15,7 @@ type Props = {
   id: string;
 };
 
-export default function DeleteItemModal({ trigger, itemName, id }: Props) {
+export default function DeleteItemModal({ trigger, itemName, id }: Readonly<Props>) {
   const [inputVal, setinputVal] = useState("");
   const [open, setOpen] = useState(false);
   const { loading } = useAppSelector((s) => s.quiz);
@@ -30,7 +30,7 @@ export default function DeleteItemModal({ trigger, itemName, id }: Props) {
         description: itemName+ " has been deleted",
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       setOpen(true);
       toast({
         variant: "destructive",
@@ -53,8 +53,7 @@ export default function DeleteItemModal({ trigger, itemName, id }: Props) {
         children: (
           <div className="w-[20rem] max-w-full flex flex-col gap-3">
             <b className="font-normal">
-              Type &ldquo;<i className="font-bold not-italic">{itemName}</i>
-              &rdquo; to delete
+              Type&ldquo;<i className="font-bold not-italic">{itemName}</i>&rdquo; to delete
             </b>
             <Input type="text" onChange={(e) => setinputVal(e.target.value)} />
             <Button

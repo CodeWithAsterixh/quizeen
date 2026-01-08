@@ -49,7 +49,7 @@ const AccountPage: React.FC = () => {
       });
       setEditing(false);
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
       toast({
         variant:"destructive",
         title:"Update info",
@@ -115,7 +115,7 @@ const AccountPage: React.FC = () => {
           <div className="flex items-center gap-3">
           <Button onClick={() => setEditing(true)}>Edit Profile</Button>
          {
-          user && user.role === 'student' &&  <UseModal
+          user?.role === 'student' &&  <UseModal
           trigger={<Button variant={"destructive"}>Delete Account</Button>}
           contentHeader={{
             title: "Delete Account",

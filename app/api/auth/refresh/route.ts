@@ -39,7 +39,7 @@ export async function POST() {
 
     // Revoke old token and create new one
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const newTokenId = require('crypto').randomBytes(16).toString('hex');
+    const newTokenId = require('node:crypto').randomBytes(16).toString('hex');
     const expiresIn = 30 * 24 * 60 * 60; // 30 days
     const newRefreshJwt = jwt.sign({ userId, jti: newTokenId }, JWT_SECRET, { algorithm: 'HS256', expiresIn: `${expiresIn}s` });
 
@@ -56,7 +56,7 @@ export async function POST() {
     const user = await User.findById(userId);
     if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
-    const accessToken = signJWT({ userId: user._id.toString(), role: user.role as any });
+    const accessToken = signJWT({ userId: user._id.toString(), role: user.role });
 
     const response = NextResponse.json({ ok: true });
     setAccessTokenCookie(response, accessToken);

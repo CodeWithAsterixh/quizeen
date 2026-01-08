@@ -8,26 +8,29 @@ interface OptionCardProps {
   optionKey: "A" | "B" | "C" | "D";
   optionValue: string;
   isSelected: boolean;
-  onSelect: () => void;
 }
 
-const OptionCard: React.FC<OptionCardProps> = ({ optionKey, optionValue, isSelected, onSelect }) => {
-
-  
+const OptionCard: React.FC<OptionCardProps> = ({
+  optionKey,
+  optionValue,
+  isSelected,
+}) => {
   return (
     <div
       className={clsx(
-        "flex items-center space-x-2 cursor-pointer bg-neutral-100 p-4 rounded-md duration-300",
-        isSelected && "bg-neutral-600 text-white !cursor-default"
+        "flex items-center space-x-2 bg-neutral-100 p-4 rounded-md duration-300",
+        isSelected && "bg-neutral-600 text-white"
       )}
-      onClick={onSelect}
     >
       <RadioGroupItem
         value={optionKey}
         id={optionKey}
-        className={clsx("duration-300", isSelected && "bg-white border-white outline-none")}
+        className={clsx(
+          "duration-300",
+          isSelected && "bg-white border-white outline-none"
+        )}
       />
-      <Label htmlFor={optionKey} className="break-all">
+      <Label htmlFor={optionKey} className="break-all cursor-pointer flex-1 py-2">
         {optionValue}
       </Label>
     </div>

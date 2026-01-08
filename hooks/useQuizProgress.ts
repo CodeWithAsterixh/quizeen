@@ -82,7 +82,7 @@ export const useQuizProgress = () => {
       const entry = arr.find((a) => a.quizId === currentQuiz._id);
       if (entry) syncProgressToServer(entry);
       if (progressSaveInterval.current == null) {
-        progressSaveInterval.current = window.setInterval(() => {
+        progressSaveInterval.current = globalThis.window.setInterval(() => {
           const a = readOngoing().find((x) => x.quizId === currentQuiz._id);
           if (a) syncProgressToServer(a);
         }, 30000) as unknown as number;
@@ -123,7 +123,7 @@ export const useQuizProgress = () => {
                     a.push({ ...entry, answers: serverAnswers, lastSavedAt: new Date().toISOString() });
                     writeOngoing(a);
                   }
-                  window.dispatchEvent(new CustomEvent('ongoingProgressUpdated', { detail: { quizId: currentQuiz._id } }));
+                  globalThis.window.dispatchEvent(new CustomEvent('ongoingProgressUpdated', { detail: { quizId: currentQuiz._id } }));
                 }
               }
             } catch (error) {
@@ -131,7 +131,7 @@ export const useQuizProgress = () => {
             }
           })();
           if (progressSaveInterval.current == null) {
-            progressSaveInterval.current = window.setInterval(() => {
+            progressSaveInterval.current = globalThis.window.setInterval(() => {
               const a = readOngoing().find((x) => x.quizId === currentQuiz._id);
               if (a) syncProgressToServer(a);
             }, 30000) as unknown as number;
@@ -162,9 +162,9 @@ export const useQuizProgress = () => {
         syncProgressToServer({ ...a, userId: user?._id });
       }
     };
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    globalThis.window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      globalThis.window.removeEventListener("beforeunload", handleBeforeUnload);
       if (progressSaveInterval.current != null) {
         clearInterval(progressSaveInterval.current as any);
         progressSaveInterval.current = null;

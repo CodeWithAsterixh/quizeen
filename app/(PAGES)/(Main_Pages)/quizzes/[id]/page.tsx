@@ -27,7 +27,8 @@ export default function Page() {
 
   const { targetRef, toPDF } = usePDF();
   const { quizTiming, startQuiz, endQuiz, setTimeLeft } = useQuizTiming();
-  const { startQuizProgress, resumeQuizProgress, endQuizProgress } = useQuizProgress();
+  const { startQuizProgress, resumeQuizProgress, endQuizProgress } =
+    useQuizProgress();
   const { resultProcess, handleEnd, updateResultProcess } = useQuizResult();
   const [resave, setResave] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,15 +88,63 @@ export default function Page() {
       </div>
     );
   }
-  const next = JSON.stringify(authInterceptorNext({url:`/quizzes/${currentQuiz._id}`, action:'quiz-submit'}))
-  
+  const next = JSON.stringify(
+    authInterceptorNext({
+      url: `/quizzes/${currentQuiz._id}`,
+      action: "quiz-submit",
+    })
+  );
+  const shouldSaveResult = saveResults ? null : (
+    <Button
+      variant="secondary"
+      className="flex items-center justify-center gap-2"
+      onClick={resaveResult}
+    >
+      <Save />
+      Save result
+    </Button>
+  );
+  const resultAvailable =
+    resultProcess.status === "processed" && resultProcess.result ? (
+      <div className="w-full flex flex-col gap-3">
+        <ResultComponent
+          ref={targetRef}
+          quiz={currentQuiz}
+          attempt={resultProcess.result}
+        />
+        <div className="w-full flex gap-2 px-2 items-center justify-end">
+          {role === "guest" ? (
+            <Link href={`/auth/login?_next=${next}`}>
+              <Button
+                variant="secondary"
+                className="flex items-center justify-center gap-2"
+              >
+                Save results
+              </Button>
+            </Link>
+          ) : (
+            shouldSaveResult
+          )}
+          <Button
+            variant="primary"
+            className="flex items-center justify-center gap-2"
+            onClick={handlePDF}
+          >
+            <DownloadIcon />
+            Download as pdf
+          </Button>
+        </div>
+      </div>
+    ) : null;
 
   return (
     <div className="w-full max-w-3xl m-auto py-5 px-2 sm:px-4 flex flex-col gap-4">
       {error && (
         <div className="w-full p-4 bg-red-100 border border-red-400 text-red-700 rounded">
           <p>Error: {error}</p>
-          <button onClick={() => setError(null)} className="mt-2 underline">Dismiss</button>
+          <button onClick={() => setError(null)} className="mt-2 underline">
+            Dismiss
+          </button>
         </div>
       )}
       {resultProcess.status === "loading" ? (
@@ -104,44 +153,9 @@ export default function Page() {
           <b>Processing your result.</b>
           <b>Please wait...</b>
         </div>
-      ) : resultProcess.status === "processed" && resultProcess.result ? (
-        <div className="w-full flex flex-col gap-3">
-          <ResultComponent
-            ref={targetRef}
-            quiz={currentQuiz}
-            attempt={resultProcess.result}
-          />
-          <div className="w-full flex gap-2 px-2 items-center justify-end">
-            {role === "guest" ? (
-              <Link href={`/auth/login?_next=${next}`}>
-                <Button
-                  variant="secondary"
-                  className="flex items-center justify-center gap-2"
-                >
-                  Save results
-                </Button>
-              </Link>
-            ) : !saveResults ? (
-              <Button
-                variant="secondary"
-                className="flex items-center justify-center gap-2"
-                onClick={resaveResult}
-              >
-                <Save />
-                Save result
-              </Button>
-            ) : null}
-            <Button
-              variant="primary"
-              className="flex items-center justify-center gap-2"
-              onClick={handlePDF}
-            >
-              <DownloadIcon />
-              Download as pdf
-            </Button>
-          </div>
-        </div>
-      ) : null}
+      ) : (
+        resultAvailable
+      )}
 
       {!quizTiming.started && (
         <>

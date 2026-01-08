@@ -28,7 +28,7 @@ type props = {
   dataFiller?:QuizFormState,
   type?:"ADD"|"EDIT"
 }
-export default function QuizForm({dataFiller, type="ADD"}:props) {
+export default function QuizForm({dataFiller, type="ADD"}:Readonly<props>) {
   const {toast} = useToast()
   const {push} = useRouter()
 
@@ -55,10 +55,6 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
     });
   };
   const handleRemoveQuestion = (index: number) => {
-    // setQuiz((prev) => ({
-    //   ...prev,
-    //   questions: prev.questions.filter((_, i) => i !== index),
-    // }));
     toast({
       variant:"info",
       description:`Question ${index+1} has been deleted sucessfully`
@@ -86,7 +82,7 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
       })
       return
     }
-    if(parseInt(`${duration}`)===0){
+    if(Number.parseInt(`${duration}`)===0){
       toast({
         variant:"warning",
         description:"Test duration is required"
@@ -119,7 +115,7 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
     const updatedAt = new Date().toISOString()
       dispatch(CreateQuiz({
         ...quiz,
-        duration: parseInt(`${quiz.duration}`),
+        duration: Number.parseInt(`${quiz.duration}`),
         createdBy,
         createdAt,
         updatedAt,
@@ -138,7 +134,7 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
     }else if(type==="EDIT"){
       dispatch(UpdateQuiz({
         ...quiz,
-        duration: parseInt(`${quiz.duration}`),
+        duration: Number.parseInt(`${quiz.duration}`),
       })).then(()=>{
         toast({
           variant:"success",
@@ -158,6 +154,26 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
 
   }
 
+
+  const handleRemove = (index: number) => {
+    handleRemoveQuestion(index);
+  };
+
+  const renderDeleteModalContent = (index: number) => (
+    <div className="w-full flex flex-col gap-3">
+      <DialogClose asChild>
+        <Button variant={"default"}>Cancel</Button>
+      </DialogClose>
+      <DialogClose asChild>
+        <Button
+          variant={"destructive"}
+          onClick={() => handleRemove(index)}
+        >
+          Yes, Delete
+        </Button>
+      </DialogClose>
+    </div>
+  );
 
   return (
     <Card className="max-w-4xl mx-auto">
@@ -189,7 +205,7 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
         <h3 className="text-lg font-medium">Questions</h3>
         <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(200px,_1fr))] gap-2">
           {quiz.questions.map((question, index) => (
-            <Card key={index} className="p-4 border flex flex-col gap-2">
+            <Card key={index + 1} className="p-4 border flex flex-col gap-2">
               <h3 className="font-bold text-lg line-clamp-2">
                 {question.text}
               </h3>
@@ -208,33 +224,30 @@ export default function QuizForm({dataFiller, type="ADD"}:props) {
                   }
                   actions={{
                     handleQuestionSave(question) {
-                      handleEditQuestion(index,question )
+                      handleEditQuestion(index, question);
                     },
-                    handleRemoveQuestion,
-                    type:"edit"
+                    handleRemoveQuestion: () => handleRemove(index),
+                    type: "edit",
                   }}
                   index={index}
                   questionFill={question}
                 />
 
-                <UseModal trigger={<Button variant={"destructive"}>
-                  <Trash2Icon />
-                </Button>} contentHeader={{
-                  title:`Delete Question ${index+1}`,
-                  description: "Are you sure you want to delete this question?"
-                }} contentFooter={{
-                  children:<div className="w-full flex flex-col gap-3">
-                  <DialogClose asChild>
-                    <Button variant={"default"}>Cancel</Button>
-                  </DialogClose>
-                  <Button
-                    variant={"destructive"}
-                    onClick={() => handleRemoveQuestion(index)}
-                  >
-                    Yes, Delete
-                  </Button>
-                </div>
-                }}></UseModal>
+                <UseModal
+                  trigger={
+                    <Button variant={"destructive"}>
+                      <Trash2Icon />
+                    </Button>
+                  }
+                  contentHeader={{
+                    title: `Delete Question ${index + 1}`,
+                    description:
+                      "Are you sure you want to delete this question?",
+                  }}
+                  contentFooter={{
+                    children: renderDeleteModalContent(index),
+                  }}
+                ></UseModal>
               </div>
             </Card>
           ))}

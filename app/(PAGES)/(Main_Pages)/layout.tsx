@@ -10,7 +10,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const path = usePathname();
   const dispatch = useAppDispatch();
   const { user, loading, error,role,token } = useAppSelector((state) => state.auth);

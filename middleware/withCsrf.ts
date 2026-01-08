@@ -1,7 +1,7 @@
 import { ForbiddenError } from '@/lib/errors';
 import { CSRF_HEADER, validateCsrfToken } from '@/lib/security/csrf';
 
-const CSRF_PROTECTED_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'];
+const CSRF_PROTECTED_METHODS = new Set(['POST', 'PUT', 'DELETE', 'PATCH']);
 
 import type { MiddlewareFactory } from '@/types/middleware';
 
@@ -13,7 +13,7 @@ export const withCsrf: MiddlewareFactory = (handler) => {
     }
 
     // Only check CSRF for state-changing methods
-    if (CSRF_PROTECTED_METHODS.includes(req.method)) {
+    if (CSRF_PROTECTED_METHODS.has(req.method)) {
       const csrfToken = req.headers.get(CSRF_HEADER);
       const isValid = await validateCsrfToken(csrfToken ?? undefined);
       if (!isValid) {

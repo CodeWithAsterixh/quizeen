@@ -11,7 +11,7 @@ interface MinuteCountdownProps {
   show:boolean
 }
 
-export function MinuteCountdown({ minutes,setEnd,show }: MinuteCountdownProps) {
+export function MinuteCountdown({ minutes,setEnd,show }: Readonly<MinuteCountdownProps>) {
   // Convert minutes to seconds for internal state.
   const [secondsLeft, setSecondsLeft] = useState(minutes * 60);
 

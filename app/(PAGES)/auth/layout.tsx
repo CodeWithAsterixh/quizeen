@@ -4,7 +4,7 @@ import React, { Suspense } from "react";
 type props = {
   children: React.ReactNode;
 };
-export default function AuthLayout({ children }: props) {
+export default function AuthLayout({ children }: Readonly<props>) {
   return (
     <Suspense
       fallback={

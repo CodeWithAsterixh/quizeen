@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
+import { withAuth } from '@/middleware/withAuth';
 import type { NextRequestHandler } from '@/types/middleware';
-import { getUserFromRequest, withAuth } from '@/middleware/withAuth';
+import { NextResponse } from 'next/server';
 
 export const withRole = (allowedRoles: string[] | string, handler: NextRequestHandler): NextRequestHandler => {
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];

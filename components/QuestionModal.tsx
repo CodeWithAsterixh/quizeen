@@ -33,10 +33,10 @@ export default function QuestionModal({
   trigger,
   actions,
   questionFill
-}: Props) {
+}: Readonly<Props>) {
   const {toast} = useToast()
   const [question, setQuestion] = useState<Question>(questionFill||{
-    _id: Math.random().toString(36).substr(2, 9),
+    _id: Math.random().toString(36).substring(2, 9),
     text: "",
     options: { A: "", B: "", C: "", D: "" },
     correctAnswer: "A",
@@ -82,21 +82,65 @@ export default function QuestionModal({
        
     }
     setQuestion({
-        _id: Math.random().toString(36).substr(2, 9),
+        _id: Math.random().toString(36).substring(2, 11),
         text: "",
         options: { A: "", B: "", C: "", D: "" },
         correctAnswer: "A",
       })
   };
   
+  const handleOptionChange = (key: "A" | "B" | "C" | "D", value: string) => {
+    handleQuestionChange("options", {
+      ...question?.options,
+      [key]: value,
+    });
+  };
+
+  const handleRemove = () => {
+    if (actions?.handleRemoveQuestion) {
+      actions.handleRemoveQuestion(index);
+    }
+  };
+
+  const renderOptions = () => {
+    return (["A", "B", "C", "D"] as const).map((key) => (
+      <Input
+        key={key}
+        placeholder={`Option ${key}`}
+        value={question?.options[key]}
+        onChange={(e) => handleOptionChange(key, e.target.value)}
+      />
+    ));
+  };
+
+  const renderCorrectAnswerOptions = () => {
+    return (["A", "B", "C", "D"] as const).map((key) => (
+      <div
+        key={key}
+        className="flex items-center space-x-2"
+      >
+        <RadioGroupItem
+          value={key}
+          id={`${index}-${key}`}
+          className={clsx({
+            "!border-blue-500": question?.correctAnswer === key,
+          })}
+        />
+        <Label htmlFor={`${index}-${key}`} className="cursor-pointer">
+          {key}
+        </Label>
+      </div>
+    ));
+  };
+
   return (
     <>
-    <UseModal
-      trigger={trigger}
-      contentHeader={{
-        title: "Add new question"
-      }}
-      others={
+      <UseModal
+        trigger={trigger}
+        contentHeader={{
+          title: "Add new question",
+        }}
+        others={
           <Card key={index} className="w-[80vw] p-4 border flex flex-col gap-2">
             <div>
               <Label>Question {index + 1}</Label>
@@ -110,64 +154,29 @@ export default function QuestionModal({
             </div>
             <div className="flex flex-col gap-2">
               <Label>Options</Label>
-              {(["A", "B", "C", "D"] as const).map((key) => (
-                <Input
-                  key={key}
-                  placeholder={`Option ${key}`}
-                  value={question?.options[key]}
-                  onChange={(e) =>
-                    handleQuestionChange("options", {
-                      ...question?.options,
-                      [key]: e.target.value,
-                    })
-                  }
-                />
-              ))}
+              {renderOptions()}
             </div>
             <div>
               <Label>Correct Answer</Label>
               <RadioGroup
                 value={question?.correctAnswer}
+                onValueChange={(value) => handleQuestionChange("correctAnswer", value)}
                 className="flex gap-5 flex-row p-2"
               >
-                {(["A", "B", "C", "D"] as const).map((key) => (
-                  <div
-                    key={key}
-                    onClick={() => handleQuestionChange("correctAnswer", key)}
-                    className="flex items-center space-x-2"
-                  >
-                    <RadioGroupItem
-                      value={key}
-                      id={`${index}-${key}`}
-                      className={clsx({
-                        "!border-blue-500": question?.correctAnswer === key,
-                      })}
-                    />
-                    <Label htmlFor={`${index}-${key}`}>{key}</Label>
-                  </div>
-                ))}
+                {renderCorrectAnswerOptions()}
               </RadioGroup>
             </div>
             <div className="w-full flex gap-3">
-            <DialogClose asChild>{
-                actions?.type === 'add'?
-                <Button
-                  variant="default"
-                >
-                   Cancel
-                </Button>
-                :
-              <Button
-                variant="destructive"
-                onClick={() => {if(actions?.handleRemoveQuestion){
-                    actions.handleRemoveQuestion(index)
-                }}}
-              >
-                <Trash className="h-4 w-4" /> Remove Question
-              </Button>
-              
-              }</DialogClose>
-              
+              <DialogClose asChild>
+                {actions?.type === "add" ? (
+                  <Button variant="default">Cancel</Button>
+                ) : (
+                  <Button variant="destructive" onClick={handleRemove}>
+                    <Trash className="h-4 w-4" /> Remove Question
+                  </Button>
+                )}
+              </DialogClose>
+
               <DialogClose asChild>
                 <Button variant="default" onClick={handleSave}>
                   Save
@@ -175,9 +184,9 @@ export default function QuestionModal({
               </DialogClose>
             </div>
           </Card>
-      }
-    />
-    <ToastViewport position="top-left" />
+        }
+      />
+      <ToastViewport position="top-left" />
     </>
   );
 }

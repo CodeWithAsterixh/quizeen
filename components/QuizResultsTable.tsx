@@ -15,7 +15,7 @@ interface QuizResultsTableProps {
   results: QuizAttempt[];
 }
 
-export default function QuizResultsTable({ results }: QuizResultsTableProps) {
+export default function QuizResultsTable({ results }: Readonly<QuizResultsTableProps>) {
   const [quiz, setQuiz] = useState<Quiz[]>([]);
   const { push } = useRouter();
 
@@ -25,16 +25,58 @@ export default function QuizResultsTable({ results }: QuizResultsTableProps) {
     return res.data;
   };
   useEffect(() => {
-    results.map((result) => {
-      getQuizzes(result.quizId).then((quizRes: Quiz) => {
-        setQuiz((q) => [...q, quizRes]);
-      });
-    });
+    const fetchQuizzes = async () => {
+      const quizPromises = results.map((result) => getQuizzes(result.quizId));
+      const quizRes = await Promise.all(quizPromises);
+      setQuiz(quizRes);
+    };
+
+    fetchQuizzes();
   }, [results]);
 
   function handleRoute(id: string) {
     push(`/results/${id}`);
   }
+
+  const renderRow = (result: QuizAttempt) => {
+    const quizName = quiz.find((res) => res._id === result.quizId)?.title;
+    return (
+      <TableRow
+        key={result._id}
+        onClick={() => handleRoute(result._id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleRoute(result._id);
+          }
+        }}
+        tabIndex={0}
+        className="hover:bg-gray-50 cursor-pointer focus:bg-gray-100 focus:outline-none"
+      >
+        <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+          {quiz.length > 0 && quizName ? (
+            quizName
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <LoaderIcon className="animate-spin"></LoaderIcon>
+            </div>
+          )}
+        </TableCell>
+        <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+          {result.score}
+        </TableCell>
+        <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+          {result.totalQuestions}
+        </TableCell>
+        <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+          {result.completionTime}
+        </TableCell>
+        <TableCell className="px-4 py-2 border border-gray-200 text-sm">
+          {new Date(result.createdAt).toLocaleString()}
+        </TableCell>
+      </TableRow>
+    );
+  };
 
   return (
     <div className="overflow-x-auto scrollbar">
@@ -59,38 +101,7 @@ export default function QuizResultsTable({ results }: QuizResultsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {results.map((result) => {
-            const quizName = quiz.find(res => res._id === result.quizId)?.title
-            return (
-              <TableRow
-                key={result._id}
-                onClick={()=>handleRoute(result._id)}
-                className="hover:bg-gray-50 cursor-pointer"
-              >
-                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                  {quiz.length > 0 &&  quizName? (
-                    quizName
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <LoaderIcon className="animate-spin"></LoaderIcon>
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                  {result.score}
-                </TableCell>
-                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                  {result.totalQuestions}
-                </TableCell>
-                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                  {result.completionTime}
-                </TableCell>
-                <TableCell className="px-4 py-2 border border-gray-200 text-sm">
-                  {new Date(result.createdAt).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            )
-          })}
+          {results.map(renderRow)}
 
           {results.length === 0 && (
             <tr>

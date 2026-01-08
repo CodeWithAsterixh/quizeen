@@ -8,7 +8,6 @@ export async function POST(req:Request) {
   try {
     await connectToDatabase()
     const {title, description,duration,questions,createdBy,createdAt,updatedAt} = await req.json() as quizType
-    // const quizzes =Quiz.find();
     const newQuiz = new Quiz({
       title,
       description,

@@ -12,7 +12,7 @@ type Props = {
     trigger:React.ReactNode
 }
 
-export default function LogOutModal({trigger}: Props) {
+export default function LogOutModal({trigger}: Readonly<Props>) {
     const dispatch = useAppDispatch()
    const handleLogout = () => {
       dispatch(logout());

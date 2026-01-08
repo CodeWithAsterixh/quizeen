@@ -6,7 +6,7 @@ import FAQAccordion, { FAQ } from "@/components/FAQAccordion";
 
 const aboutContent = {
   description:
-    "Welcome to Quizeen quiz taker – a platform designed to make learning fun and engaging through a variety of quizzes on different topics.",
+    "Welcome to Quizeen quiz taker - a platform designed to make learning fun and engaging through a variety of quizzes on different topics.",
   developerInfo:
     "Developed and maintained by Paul (aka-Asterixh) . Passionate about creating bug-free, production-grade applications using modern web technologies.",
   userCapabilities:

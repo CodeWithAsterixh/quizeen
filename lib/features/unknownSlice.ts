@@ -4,7 +4,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Initial state
 const initialState: {
-    state:any|undefined,
+    state:any,
     from:string
 }={
     state:undefined,

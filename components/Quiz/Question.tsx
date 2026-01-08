@@ -87,11 +87,11 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
       if (!raw) return;
       const arr = JSON.parse(raw) as any[];
       const entry = arr.find((a) => a.quizId === currentQuiz?._id);
-      if (entry && entry.answers) {
+      if (entry?.answers) {
         setAnswers(entry.answers);
         // set current to the last answered question index (or keep at 0)
         const answeredIndexes = Object.keys(entry.answers)
-          .map((k) => Number(k))
+          .map(Number)
           .filter((n) => !Number.isNaN(n))
           .sort((a, b) => a - b);
         if (answeredIndexes.length > 0) {
@@ -116,10 +116,10 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
         if (!raw) return;
         const arr = JSON.parse(raw) as any[];
         const entry = arr.find((a) => a.quizId === currentQuiz?._id);
-        if (entry && entry.answers) {
+        if (entry?.answers) {
           setAnswers(entry.answers);
           const answeredIndexes = Object.keys(entry.answers)
-            .map((k) => Number(k))
+            .map(Number)
             .filter((n) => !Number.isNaN(n))
             .sort((a, b) => a - b);
           if (answeredIndexes.length > 0) {
@@ -131,11 +131,39 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
         // ignore
       }
     };
-    window.addEventListener('ongoingProgressUpdated', handler as EventListener);
-    return () => window.removeEventListener('ongoingProgressUpdated', handler as EventListener);
+    globalThis.window.addEventListener('ongoingProgressUpdated', handler as EventListener);
+    return () => globalThis.window.removeEventListener('ongoingProgressUpdated', handler as EventListener);
   }, [currentQuiz, setAnswers, setQuizState]);
 
   const currentQuestion = currentQuiz?.questions[quizState.current];
+
+  const persistProgress = () => {
+    try {
+      const key = "ongoingQuizzes";
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const arr = JSON.parse(raw) as any[];
+        const idx = arr.findIndex((a: any) => a.quizId === currentQuiz?._id);
+        if (idx >= 0) {
+          arr[idx].lastSavedAt = new Date().toISOString();
+          arr[idx].answers = answers;
+          localStorage.setItem(key, JSON.stringify(arr));
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const onPrev = () => {
+    handlePrev();
+    persistProgress();
+  };
+
+  const onNext = () => {
+    handleNext();
+    persistProgress();
+  };
 
   if(!show)return null
   if (!currentQuiz || !currentQuestion) {
@@ -155,16 +183,16 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
             <RadioGroup
               className="grid grid-cols-1 sm:grid-cols-2"
               value={answers[quizState.current + 1]}
+              onValueChange={(value) =>
+                updateAnswer(quizState.current, value as selectedOptions)
+              }
             >
               {Object.entries(currentQuestion.options).map(([key, value]) => (
                 <OptionCard
                   key={key}
                   optionKey={key as "A" | "B" | "C" | "D"}
-                  optionValue={value as string}
+                  optionValue={value}
                   isSelected={answers[quizState.current + 1] === key}
-                  onSelect={() =>
-                    updateAnswer(quizState.current, key as selectedOptions)
-                  }
                 />
               ))}
             </RadioGroup>
@@ -181,60 +209,24 @@ const QuestionComponent: React.FC<QuestionComponentProps> = ({
               {quizState.current !== 0 && (
                 <Button
                   variant="default"
-                  onClick={() => {
-                    handlePrev();
-                    // persist navigation state
-                    try {
-                      const key = "ongoingQuizzes";
-                      const raw = localStorage.getItem(key);
-                      if (raw) {
-                        const arr = JSON.parse(raw) as any[];
-                        const idx = arr.findIndex((a) => a.quizId === currentQuiz?._id);
-                        if (idx >= 0) {
-                          arr[idx].lastSavedAt = new Date().toISOString();
-                          arr[idx].answers = answers;
-                          localStorage.setItem(key, JSON.stringify(arr));
-                        }
-                      }
-                    } catch{
-                      // ignore
-                    }
-                  }}
+                  onClick={onPrev}
                 >
                   Previous
                 </Button>
               )}
-              {quizState.current !== currentQuiz.questions.length - 1 ? (
-                <Button
-                  disabled={!answers[quizState.current + 1]}
-                  onClick={() => {
-                    handleNext();
-                    // persist navigation state on next
-                    try {
-                      const key = "ongoingQuizzes";
-                      const raw = localStorage.getItem(key);
-                      if (raw) {
-                        const arr = JSON.parse(raw) as any[];
-                        const idx = arr.findIndex((a) => a.quizId === currentQuiz?._id);
-                        if (idx >= 0) {
-                          arr[idx].lastSavedAt = new Date().toISOString();
-                          arr[idx].answers = answers;
-                          localStorage.setItem(key, JSON.stringify(arr));
-                        }
-                      }
-                    } catch{
-                      // ignore
-                    }
-                  }}
-                >
-                  Next
-                </Button>
-              ) : (
+              {quizState.current === currentQuiz.questions.length - 1 ? (
                 <Button
                   disabled={!answers[quizState.current + 1]}
                   onClick={handleSubmit}
                 >
                   Submit {loading && <Loader2 className="animate-spin" />}
+                </Button>
+              ) : (
+                <Button
+                  disabled={!answers[quizState.current + 1]}
+                  onClick={onNext}
+                >
+                  Next
                 </Button>
               )}
             </div>

@@ -1,6 +1,6 @@
-export interface authInterceptor {
+export interface AuthInterceptor {
     url:string,
     action:'quiz-submit'
 }
 
-export const authInterceptorNext = (interceptor:authInterceptor)=>interceptor
+export const authInterceptorNext = (interceptor:AuthInterceptor)=>interceptor

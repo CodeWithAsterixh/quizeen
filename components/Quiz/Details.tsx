@@ -14,14 +14,14 @@ import { PencilLine, Trash2Icon } from "lucide-react";
 import Loader from "../loader";
 import { useEffect, useState } from "react";
 
-export default function Details({ startQuiz }: { startQuiz: () => void }) {
+export default function Details({ startQuiz }: Readonly<{ startQuiz: () => void }>) {
   const currentQuiz = useAppSelector((s) => s.quiz.currentQuiz);
   const { role } = useAppSelector((s) => s.auth);
   const [isDone, setIsDone] = useState(false)
   const userCompleted = useAppSelector(s=>s.quiz.userCompleted)
   
     useEffect(() => {
-      if(userCompleted.length>0&&userCompleted.find(q=>q.quizId===currentQuiz?._id)){
+      if(userCompleted.some(q=>q.quizId===currentQuiz?._id)){
         setIsDone(true)
       }else{
         setIsDone(false)

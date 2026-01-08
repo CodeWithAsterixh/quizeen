@@ -51,33 +51,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ quiz
     await connectToDatabase();
     const { quizId } = await params;
 
-    // Try to derive userId from Authorization header or cookie
-    let userId: string | null = null;
-    const authHeader = req.headers.get('authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '');
-      try {
-        const decoded: any = jwt.verify(token, JWT_SECRET);
-        userId = decoded.userId;
-      } catch{
-        // ignore
-      }
-    } else {
-      const cookieHeader = req.headers.get('cookie');
-      if (cookieHeader) {
-        const parsed = Object.fromEntries(cookieHeader.split(';').map((s) => s.trim().split('=').map(decodeURIComponent)) as [string,string][]);
-        const token = parsed['token'] || parsed['authToken'] || null;
-        if (token) {
-          try {
-            const decoded: any = jwt.verify(token, JWT_SECRET);
-            userId = decoded.userId;
-          } catch {
-            // ignore
-          }
-        }
-      }
-    }
-
+    const userId = await getUserId(req);
     if (!userId) {
       return NextResponse.json({ message: 'No progress for anonymous user' }, { status: 404 });
     }
@@ -90,3 +64,43 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ quiz
     return NextResponse.json({ message: 'Failed to fetch progress' }, { status: 500 });
   }
 }
+
+async function getUserId(req: NextRequest): Promise<string | null> {
+  const fromHeader = getUserIdFromAuthHeader(req);
+  if (fromHeader) return fromHeader;
+
+  const fromCookie = await getUserIdFromCookie(req);
+  return fromCookie;
+}
+
+function getUserIdFromAuthHeader(req: NextRequest): string | null {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader?.startsWith('Bearer ')) return null;
+
+  const token = authHeader.replace('Bearer ', '');
+  try {
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    return decoded.userId;
+  } catch {
+    return null;
+  }
+}
+
+async function getUserIdFromCookie(req: NextRequest): Promise<string | null> {
+  const cookieHeader = req.headers.get('cookie');
+  if (!cookieHeader) return null;
+
+  const parsed = Object.fromEntries(
+    cookieHeader.split(';').map((s) => s.trim().split('=').map(decodeURIComponent) as [string, string])
+  );
+  const token = parsed['token'] || parsed['authToken'] || null;
+  if (!token) return null;
+
+  try {
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    return decoded.userId;
+  } catch {
+    return null;
+  }
+}
+

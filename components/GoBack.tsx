@@ -5,11 +5,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 
 
-export default function GoBack({to}:{to:string}) {
+export default function GoBack({to}:Readonly<{to:string}>) {
     const {push} = useRouter()
     const paths = usePathname()
     const handleBack=useCallback(()=>{
-        const newPaths = to?to:paths.split("/").slice(0, -1).join("/")
+        const newPaths = to || paths.split("/").slice(0, -1).join("/")
         push(newPaths)
     
     },[paths, push, to])

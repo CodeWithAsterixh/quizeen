@@ -2,17 +2,16 @@
 import AuthForm from '@/components/AuthForm'
 import { useAuthSuccess } from '@/hooks/useAuthSuccess'
 import { AuthResponse } from '@/types'
-import { authInterceptor } from '@/utils/authInterceptorNext'
+import { AuthInterceptor } from '@/utils/authInterceptorNext'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import React from 'react'
 
-type Props = object
 
-export default function Page({}: Props) {
+export default function Page() {
   const searchParams = useSearchParams()
     const _next = searchParams.get("_next") as unknown as string | null;
-    const _next_obj = JSON.parse(_next||`{}`) as authInterceptor
+    const _next_obj = JSON.parse(_next||`{}`) as AuthInterceptor
     const successAction = useAuthSuccess(_next_obj);
     const handleSuccessAction = (res: AuthResponse)=>{
       successAction(res)

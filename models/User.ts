@@ -52,13 +52,13 @@ const UserSchema: Schema<IUser> = new Schema(
     toJSON: {
       transform: (doc: any, ret: any) => {
         // normalize _id and timestamps for JSON consumers
-        if (ret && ret._id) ret._id = ret._id.toString();
-        if (ret && ret.createdAt) ret.createdAt = (ret.createdAt as Date).toISOString();
-        if (ret && ret.updatedAt) ret.updatedAt = (ret.updatedAt as Date).toISOString();
+        if (ret?._id) ret._id = ret._id.toString();
+        if (ret?.createdAt) ret.createdAt = (ret.createdAt as Date).toISOString();
+        if (ret?.updatedAt) ret.updatedAt = (ret.updatedAt as Date).toISOString();
         // remove internal fields
         try {
-          delete (ret as any).__v;
-          delete (ret as any).passwordHash; // Always remove password hash from JSON
+          delete (ret).__v;
+          delete (ret).passwordHash; // Always remove password hash from JSON
         } catch {
           // ignore
         }

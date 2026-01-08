@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
 import { RefreshToken } from '@/models/RefreshToken';
 import { connectToDatabase } from '@/lib/mongo';
 import { signJWT } from './jwt';
@@ -37,8 +37,8 @@ export async function verifyRefreshToken(token: string) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET!) as jwt.JwtPayload & { jti?: string; userId?: string };
-    const tokenId = decoded.jti as string | undefined;
-    const userId = decoded.userId as string | undefined;
+    const tokenId = decoded.jti;
+    const userId = decoded.userId;
     if (!tokenId || !userId) throw new Error('Invalid refresh token payload');
 
     const dbToken = await RefreshToken.findOne({ tokenId });

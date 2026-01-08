@@ -18,7 +18,7 @@ type Props = {
   ref: React.Ref<HTMLDivElement>;
 };
 
-export default function ResultComponent({ quiz, attempt, ref, pdfMode, userName }: Props) {
+export default function ResultComponent({ quiz, attempt, ref, pdfMode, userName }: Readonly<Props>) {
   const attemptedOn = new Date(attempt.createdAt).toLocaleString();
   const correctCount = attempt.details.filter(
     (d) => d.userAnswer === d.correctAnswer
@@ -106,7 +106,7 @@ export default function ResultComponent({ quiz, attempt, ref, pdfMode, userName 
               const isCorrect = answer.userAnswer === answer.correctAnswer;
               return (
                 <TableRow key={answer.questionId} className="border-b align-top">
-                  <TableCell className={`${pdfMode ? "py-2" : "py-2"}`}>{index + 1}</TableCell>
+                  <TableCell className={`py-2`}>{index + 1}</TableCell>
                   <TableCell className="py-2 pr-3">
                     <p className="font-medium leading-snug line-clamp-2">{question ? question.text : "N/A"}</p>
                   </TableCell>

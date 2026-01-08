@@ -12,7 +12,7 @@ export async function PUT(request: Request) {
   // Token may be provided via Authorization header or cookies (authToken/token)
   let token: string | null = null;
   const authHeader = request.headers.get('authorization') || request.headers.get('Authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
+  if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.replace('Bearer ', '');
   } else {
     const cookieHeader = request.headers.get('cookie') || request.headers.get('Cookie') || '';

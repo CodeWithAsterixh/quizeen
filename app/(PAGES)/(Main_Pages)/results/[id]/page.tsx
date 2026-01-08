@@ -34,7 +34,7 @@ export default function Page() {
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
       return;
     }
   }, [id]);
@@ -43,7 +43,7 @@ export default function Page() {
     // Enable PDF-safe styles for capture
     setPdfMode(true);
     try {
-      await toPDF({
+      toPDF({
         canvas: {
           mimeType: "image/jpeg",
           qualityRatio: 0.85,

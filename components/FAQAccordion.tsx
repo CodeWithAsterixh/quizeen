@@ -21,7 +21,7 @@ const FAQAccordion: React.FC<FAQAccordionProps> = ({ faqs }) => {
   return (
     <Accordion type="single" collapsible className="w-full">
       {faqs.map((faq, index) => (
-        <AccordionItem key={index} value={`faq-${index}`}>
+        <AccordionItem key={index+1} value={`faq-${index}`}>
           <AccordionTrigger className="text-left font-medium">
             {faq.question}
           </AccordionTrigger>

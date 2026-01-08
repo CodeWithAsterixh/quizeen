@@ -24,8 +24,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json([]);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { message: "Failed to submit quiz" },
       { status: 500 }

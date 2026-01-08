@@ -4,7 +4,7 @@ import api from "@/utils/api";
 
 // Load settings from localStorage if available
 const loadSettings = (): SettingsState => {
-  if (typeof window !== "undefined") {
+  if (globalThis.window !== undefined) {
     const storedSettings = localStorage.getItem("userSettings");
     return storedSettings ? JSON.parse(storedSettings) : { theme: "light", saveResults: true };
   }

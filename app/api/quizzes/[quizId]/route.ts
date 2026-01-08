@@ -16,7 +16,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ quizId: 
     }
     return NextResponse.json(quiz);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: "Failed to fetch quiz" }, { status: 500 });
   }
 }

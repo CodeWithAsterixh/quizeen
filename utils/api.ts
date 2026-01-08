@@ -1,5 +1,5 @@
 import axios from "axios";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 
 // Create an Axios instance for API calls
 const api = axios.create({
@@ -16,7 +16,7 @@ let currentCsrfToken: string | null = null;
 // Intercept responses to capture CSRF token
 api.interceptors.response.use(
   (response) => {
-    const newToken = response.headers['x-csrf-token'];
+    const newToken = response.headers["x-csrf-token"];
     if (newToken) {
       currentCsrfToken = newToken;
     }
@@ -25,29 +25,38 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     // If we receive 401 and the request was not already retried, try to call refresh endpoint
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
         // Attempt to refresh tokens (server will read HttpOnly refresh cookie)
-        const refreshResponse = await axios.post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true });
-        if (refreshResponse.status === 200 || refreshResponse.status === 201 || refreshResponse.status === 204 || (refreshResponse.data && refreshResponse.data.ok)) {
+        const refreshResponse = await axios.post(
+          `${api.defaults.baseURL}/auth/refresh`,
+          {},
+          { withCredentials: true }
+        );
+        if (
+          refreshResponse.status === 200 ||
+          refreshResponse.status === 201 ||
+          refreshResponse.status === 204 ||
+          (refreshResponse.data?.ok)
+        ) {
           // Retry original request (cookies will be sent automatically)
           return api(originalRequest);
         }
-      } catch{
+      } catch {
         // Refresh failed — fall through to reject original error
-        return Promise.reject(error);
+        throw new Error(error);
       }
     }
 
-    return Promise.reject(error);
+    throw new Error(error);
   }
 );
 
 // Attach the tokens to requests if available
 api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
+  if (globalThis.window !== undefined) {
     // If an access token is available in a readable cookie (non-HttpOnly), attach it as Authorization.
     // Note: in this app access tokens are HttpOnly and will be sent by the browser automatically.
     const token = Cookies.get("token");

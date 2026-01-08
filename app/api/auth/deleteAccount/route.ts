@@ -1,8 +1,7 @@
 import { connectToDatabase } from "@/lib/mongo";
 import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from "@/middleware/withAuth";
-import { getUserFromRequest } from "@/middleware/withAuth";
+import { getUserFromRequest, withAuth } from "@/middleware/withAuth";
 
 export async function DELETE(req: NextRequest) {
   // Verify authentication and get user info

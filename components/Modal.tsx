@@ -34,7 +34,7 @@ function UseModal({
   contentFooter,
   others,
   onClose
-}: props) {
+}: Readonly<props>) {
   const [opened, setOpened] = useState(open||false)
   return (
     <Dialog onClose={()=>{

@@ -10,7 +10,7 @@ import { User } from '@/models/User';
 const pass = process.env.ADMIN_PASSWORD
 if(!pass) throw new Error("admin needs a password")
 
-    const hashedPassword = await bcrypt.hash(pass, 10)
+const hashedPassword = await bcrypt.hash(pass, 10);
 const adminDetails:userType = {
   fullName: 'aster admin',
   email: 'peterpaulsilas4@gmail.com',
@@ -51,7 +51,7 @@ export async function createDefaultAdmin() {
 
     // Save the admin user to the database
     await adminUser.save();
-  } catch (error) {
+  } catch {
     return 
   } finally {
     // Close the database connection

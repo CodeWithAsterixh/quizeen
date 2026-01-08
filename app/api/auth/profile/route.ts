@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   // Try Authorization header first, then fall back to reading cookie header (for HttpOnly access tokens)
   let token: string | null = null;
   const authHeader = request.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
+  if (authHeader?.startsWith("Bearer ")) {
     token = authHeader.replace("Bearer ", "");
   } else {
     const cookieHeader = request.headers.get("cookie");
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   // Try Authorization header first, then fall back to reading cookie header (for HttpOnly access tokens)
   let token: string | null = null;
   const authHeader = request.headers.get("authorization");
-  if (authHeader && authHeader.startsWith("Bearer ")) {
+  if (authHeader?.startsWith("Bearer ")) {
     token = authHeader.replace("Bearer ", "");
   } else {
     const cookieHeader = request.headers.get("cookie");
